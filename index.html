@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>История: Даты</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root {
+    --bg: var(--tg-theme-bg-color, #1c1c1e);
+    --bg2: var(--tg-theme-secondary-bg-color, #2c2c2e);
+    --text: var(--tg-theme-text-color, #ffffff);
+    --hint: var(--tg-theme-hint-color, #8e8e93);
+    --accent: var(--tg-theme-button-color, #3478f6);
+    --accent-text: var(--tg-theme-button-text-color, #ffffff);
+    --link: var(--tg-theme-link-color, #3478f6);
+    --green: #34c759;
+    --red: #ff3b30;
+    --yellow: #ffd60a;
+    --radius: 16px;
+    --radius-sm: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Screens ── */
+  .screen { display: none; flex-direction: column; min-height: 100vh; padding: 0 0 32px; }
+  .screen.active { display: flex; }
+
+  /* ── Header ── */
+  .header {
+    padding: 20px 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-back {
+    width: 36px; height: 36px;
+    background: var(--bg2);
+    border-radius: 50%;
+    border: none;
+    color: var(--accent);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .header-title { font-size: 17px; font-weight: 600; }
+
+  /* ── Menu Screen ── */
+  .menu-hero {
+    padding: 32px 20px 24px;
+    text-align: center;
+  }
+  .menu-hero .emoji { font-size: 56px; margin-bottom: 12px; }
+  .menu-hero h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+  .menu-hero p { font-size: 15px; color: var(--hint); }
+
+  .section-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--hint);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0 20px;
+    margin: 20px 0 8px;
+  }
+
+  .options-group {
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .option-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .opt-btn {
+    flex: 1;
+    background: var(--bg2);
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 14px 12px;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .opt-btn .opt-icon { font-size: 22px; }
+  .opt-btn .opt-label { font-size: 13px; color: var(--hint); }
+  .opt-btn.selected {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 15%, var(--bg2));
+    color: var(--accent);
+  }
+  .opt-btn.selected .opt-label { color: var(--accent); opacity: 0.7; }
+
+  .start-btn {
+    margin: 24px 16px 0;
+    background: var(--accent);
+    color: var(--accent-text);
+    border: none;
+    border-radius: var(--radius);
+    padding: 16px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    width: calc(100% - 32px);
+    transition: opacity 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .start-btn:active { opacity: 0.8; }
+  .start-btn:disabled { opacity: 0.4; cursor: default; }
+
+  /* ── Quiz Screen ── */
+  .progress-bar-wrap {
+    padding: 16px 20px 0;
+  }
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .progress-label { font-size: 14px; color: var(--hint); }
+  .progress-score {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--green);
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--bg2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .question-card {
+    margin: 16px 16px 0;
+    background: var(--bg2);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .question-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    color: var(--accent);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .question-text {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .answers-list {
+    padding: 12px 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .answer-card {
+    background: var(--bg2);
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: all 0.15s ease;
+    text-align: left;
+    width: 100%;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.4;
+  }
+  .answer-card:active:not(:disabled) { transform: scale(0.98); }
+  .answer-label {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--hint);
+    font-size: 13px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .answer-text { flex: 1; padding-top: 4px; }
+
+  .answer-card.correct {
+    border-color: var(--green);
+    background: color-mix(in srgb, var(--green) 12%, var(--bg2));
+  }
+  .answer-card.correct .answer-label {
+    background: var(--green);
+    color: #fff;
+  }
+  .answer-card.wrong {
+    border-color: var(--red);
+    background: color-mix(in srgb, var(--red) 12%, var(--bg2));
+  }
+  .answer-card.wrong .answer-label {
+    background: var(--red);
+    color: #fff;
+  }
+  .answer-card:disabled { cursor: default; }
+
+  .feedback-bar {
+    margin: 14px 16px 0;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    display: none;
+  }
+  .feedback-bar.show { display: block; }
+  .feedback-bar.correct-fb {
+    background: color-mix(in srgb, var(--green) 12%, var(--bg2));
+    border-left: 3px solid var(--green);
+  }
+  .feedback-bar.wrong-fb {
+    background: color-mix(in srgb, var(--red) 10%, var(--bg2));
+    border-left: 3px solid var(--red);
+  }
+  .feedback-bar .fb-title { font-weight: 700; margin-bottom: 4px; }
+  .feedback-bar .fb-pair { color: var(--hint); font-size: 13px; margin-top: 6px; }
+  .feedback-bar .fb-pair span { color: var(--text); font-weight: 500; }
+
+  .next-btn {
+    margin: 16px 16px 0;
+    background: var(--accent);
+    color: var(--accent-text);
+    border: none;
+    border-radius: var(--radius);
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: calc(100% - 32px);
+    display: none;
+    transition: opacity 0.15s;
+  }
+  .next-btn.show { display: block; }
+  .next-btn:active { opacity: 0.8; }
+
+  /* ── Results Screen ── */
+  .result-hero {
+    padding: 32px 20px 20px;
+    text-align: center;
+  }
+  .result-emoji { font-size: 64px; margin-bottom: 12px; }
+  .result-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  .result-subtitle { font-size: 15px; color: var(--hint); }
+
+  .result-stats {
+    margin: 0 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .stat-card {
+    background: var(--bg2);
+    border-radius: var(--radius-sm);
+    padding: 16px 8px;
+    text-align: center;
+  }
+  .stat-value { font-size: 26px; font-weight: 700; }
+  .stat-value.green { color: var(--green); }
+  .stat-value.red { color: var(--red); }
+  .stat-value.blue { color: var(--accent); }
+  .stat-label { font-size: 12px; color: var(--hint); margin-top: 2px; }
+
+  .review-section {
+    margin: 20px 16px 0;
+  }
+  .review-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+  .review-item {
+    background: var(--bg2);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-left: 3px solid var(--hint);
+  }
+  .review-item.review-correct { border-left-color: var(--green); }
+  .review-item.review-wrong { border-left-color: var(--red); }
+  .review-item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .review-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--hint) 20%, transparent);
+    color: var(--hint);
+  }
+  .review-item.review-correct .review-badge {
+    background: color-mix(in srgb, var(--green) 20%, transparent);
+    color: var(--green);
+  }
+  .review-item.review-wrong .review-badge {
+    background: color-mix(in srgb, var(--red) 20%, transparent);
+    color: var(--red);
+  }
+  .review-question { font-size: 13px; color: var(--hint); margin-bottom: 6px; }
+  .review-answers { display: flex; flex-direction: column; gap: 4px; }
+  .review-answer {
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .review-answer.ra-correct { background: color-mix(in srgb, var(--green) 15%, transparent); color: var(--green); }
+  .review-answer.ra-wrong { background: color-mix(in srgb, var(--red) 15%, transparent); color: var(--red); }
+  .review-answer .ra-icon { flex-shrink: 0; }
+
+  .result-actions {
+    padding: 20px 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-text);
+    border: none;
+    border-radius: var(--radius);
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:active { opacity: 0.8; }
+  .btn-secondary {
+    background: var(--bg2);
+    color: var(--text);
+    border: none;
+    border-radius: var(--radius);
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: opacity 0.15s;
+  }
+  .btn-secondary:active { opacity: 0.8; }
+
+  /* ── Animations ── */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .screen.active { animation: slideUp 0.25s ease; }
+
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  .answer-card.correct, .answer-card.wrong { animation: pop 0.2s ease; }
+</style>
+</head>
+<body>
+
+<!-- ══ MENU SCREEN ══ -->
+<div class="screen active" id="screen-menu">
+  <div class="menu-hero">
+    <div class="emoji">📅</div>
+    <h1>Даты истории</h1>
+    <p>Проверь знания ключевых исторических дат</p>
+  </div>
+
+  <div class="section-label">Количество вопросов</div>
+  <div class="options-group">
+    <div class="option-row">
+      <button class="opt-btn" id="cnt-10" onclick="selectCount(10)">
+        <span class="opt-icon">🔟</span>
+        <span>10</span>
+        <span class="opt-label">быстро</span>
+      </button>
+      <button class="opt-btn" id="cnt-20" onclick="selectCount(20)">
+        <span class="opt-icon">2️⃣0️⃣</span>
+        <span>20</span>
+        <span class="opt-label">средне</span>
+      </button>
+      <button class="opt-btn" id="cnt-30" onclick="selectCount(30)">
+        <span class="opt-icon">🎯</span>
+        <span>30</span>
+        <span class="opt-label">серьёзно</span>
+      </button>
+    </div>
+    <button class="opt-btn" id="cnt-all" onclick="selectCount('all')" style="flex-direction:row;justify-content:center;gap:8px;padding:14px;">
+      <span class="opt-icon">📚</span>
+      <span>Все даты (~80)</span>
+      <span class="opt-label">полный курс</span>
+    </button>
+  </div>
+
+  <div class="section-label">Тип вопросов</div>
+  <div class="options-group">
+    <div class="option-row">
+      <button class="opt-btn" id="type-event" onclick="selectType('event')">
+        <span class="opt-icon">📅</span>
+        <span>Дата → событие</span>
+      </button>
+      <button class="opt-btn" id="type-date" onclick="selectType('date')">
+        <span class="opt-icon">📖</span>
+        <span>Событие → дата</span>
+      </button>
+    </div>
+    <button class="opt-btn" id="type-mixed" onclick="selectType('mixed')" style="flex-direction:row;justify-content:center;gap:8px;padding:14px;">
+      <span class="opt-icon">🎲</span>
+      <span>Смешанный режим</span>
+    </button>
+  </div>
+
+  <button class="start-btn" id="start-btn" onclick="startQuiz()" disabled>
+    Начать →
+  </button>
+</div>
+
+<!-- ══ QUIZ SCREEN ══ -->
+<div class="screen" id="screen-quiz">
+  <div class="progress-bar-wrap">
+    <div class="progress-info">
+      <span class="progress-label" id="progress-label">Вопрос 1 из 10</span>
+      <span class="progress-score" id="progress-score">✓ 0</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="question-type-badge" id="question-badge">📅 Дата</div>
+    <div class="question-text" id="question-text"></div>
+  </div>
+
+  <div class="answers-list" id="answers-list"></div>
+
+  <div class="feedback-bar" id="feedback-bar">
+    <div class="fb-title" id="fb-title"></div>
+    <div class="fb-pair" id="fb-pair"></div>
+  </div>
+
+  <button class="next-btn" id="next-btn" onclick="nextQuestion()">Следующий →</button>
+</div>
+
+<!-- ══ RESULTS SCREEN ══ -->
+<div class="screen" id="screen-results">
+  <div class="result-hero">
+    <div class="result-emoji" id="result-emoji">🏆</div>
+    <div class="result-title" id="result-title">Отлично!</div>
+    <div class="result-subtitle" id="result-subtitle">Результат сессии</div>
+  </div>
+
+  <div class="result-stats">
+    <div class="stat-card">
+      <div class="stat-value green" id="stat-correct">0</div>
+      <div class="stat-label">Верно</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value red" id="stat-wrong">0</div>
+      <div class="stat-label">Неверно</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value blue" id="stat-pct">0%</div>
+      <div class="stat-label">Результат</div>
+    </div>
+  </div>
+
+  <div class="review-section">
+    <div class="review-title">Разбор ответов</div>
+    <div id="review-list"></div>
+  </div>
+
+  <div class="result-actions">
+    <button class="btn-primary" onclick="restartQuiz()">🔄 Повторить</button>
+    <button class="btn-secondary" onclick="showMenu()">🏠 В меню</button>
+  </div>
+</div>
+
+<script>
+// ── Данные ──────────────────────────────────────────────────────────────────
+const ALL_DATES = [
+  ["4 тыс. до н.э.", "Возникновение Шумерского государства (первого государства в мире)"],
+  ["4–3 тыс. до н.э.", "Объединение номов в Верхнем Египте под властью Менеса"],
+  ["8–6 век до н.э.", "Великая Греческая колонизация"],
+  ["882", "Захват Киева Олегом (официальная дата создания Древней Руси)"],
+  ["907", "Поход Олега на Царьград (подписание выгодного договора с Византией, по которому русы могли торговать без пошлин)"],
+  ["941", "Неудачный поход Игоря на Византию"],
+  ["945", "Смерть Игоря в столкновении с древлянами"],
+  ["1097", "Съезд князей в Любече"],
+  ["1132", "Официальное начало разробленности в Киеве после смерти князя Мстислава"],
+  ["1185", "Неудачный поход на половцев новгород-северского князя Игоря Святославича"],
+  ["476", "Падение Западной Римской империи"],
+  ["751", "Таласская битва, поражение Китая от арабов"],
+  ["800", "Коронация Карла Великого"],
+  ["843", "Раздел империи Карла Великого между его внуками (Верденский договор)"],
+  ["962", "Создание Оттоном I Священной Римской империи на основе Центральной части бывшей Франкской империи"],
+  ["1054", "Раздел христианской церкви на западную (католическую) и восточную (православную)"],
+  ["1096–1270", "Крестовые походы"],
+  ["1137", "Создание кортесов в Кастилии (Испании)"],
+  ["1198", "Создание в Иерусалиме Тевтонского ордена"],
+  ["1206", "Создание в Индии арабского государства — Делийского султаната"],
+  ["1212", "Победа объединённых испанских сил над маврами"],
+  ["1258", "Падение Арабского халифата, завоевание монголами"],
+  ["1265", "Создание Парламента в Англии"],
+  ["1302", "Создание Генеральных штатов во Франции"],
+  ["1439", "Флорентийская уния"],
+  ["1445", "Изобретение печатного станка И. Гутенбергом"],
+  ["1448", "Избрание Московским собором первого русского митрополита РПЦ — Ионы"],
+  ["1453", "Падение Константинополя, захват Византии турками"],
+  ["1478", "Присоединение Новгорода к Российскому государству"],
+  ["1517", "Начало Реформации в Европе"],
+  ["1534", "Создание англиканской церкви"],
+  ["1534", "Начало колонизации Америки Францией, основание колонии в Квебеке"],
+  ["1545–1563", "Тридентский собор"],
+  ["1566–1609", "Буржуазная революция в Нидерландах"],
+  ["1572", "Варфоломеевская ночь"],
+  ["1598", "Нантский эдикт"],
+  ["1618–1648", "Тридцатилетняя война"],
+  ["1648", "Вестфальский мир, завершивший Тридцатилетнюю войну"],
+  ["1640–1660", "Революция в Англии"],
+  ["1641–1853", "Самоизоляция Японии (сакоку)"],
+  ["1683", "Битва за Вену"],
+  ["1775–1783", "Война за независимость американских колоний"],
+  ["1789–1799", "Великая Французская революция"],
+  ["1810–1826", "Война за независимость испанских колоний в Америке"],
+  ["1812", "Отечественная война (Наполеон против России)"],
+  ["1815", "Венский конгресс"],
+  ["1815", "Создание Священного союза"],
+  ["1821", "Антитурецкое восстание в Греции"],
+  ["1822", "Провозглашение независимости Бразилии"],
+  ["1825", "Восстание декабристов"],
+  ["1830", "Июльская революция во Франции"],
+  ["1830", "Начало революции в Бельгии"],
+  ["1848", "Установление второй республики во Франции"],
+  ["1848–1849", "Революции во Франции, Австрии, Пруссии и тд."],
+  ["1870", "Объединение Италии"],
+  ["1871", "Объединение Германии, создание Германской империи"],
+  ["1877–1878", "Русско-турецкая война"],
+  ["1880–1881, 1899–1902", "Англо-бурские войны"],
+  ["1904–1905", "Русско-японская война"],
+  ["1912", "Создание Сунь Ятсеном партии Гоминьдан в Китае"],
+  ["1914–1918", "Первая мировая война"],
+  ["21 февраля – 18 декабря 1916", "Верденская мясорубка"],
+  ["11 ноября 1918", "Компьенское перемирие"],
+  ["1918", "Буржуазно-демократические революции в Венгрии и Австрии"],
+  ["1918–1919", "Ноябрьская революция в Германии"],
+  ["1919–1920", "Парижская (Версальская) мирная конференция"],
+  ["1919", "Версальский мирный договор"],
+  ["1920", "Создание Лиги Наций"],
+  ["1921–1922", "Вашингтонская мирная конференция"],
+  ["1922", "Приход к власти фашистов в Италии"],
+  ["1922", "Провозглашение независимости Египта"],
+  ["30 декабря 1922", "Создание СССР"],
+  ["1923", "Провозглашение республики в Турции"],
+  ["1925", "Приход к власти в Иране Резы-шаха-Пехлеви"],
+  ["1929–1933", "Великая депрессия (мировой кризис)"],
+  ["1931", "Вторжение Японии в Маньчжурию"],
+  ["1933", "Приход к власти НСДАП в Германии (нацистов)"],
+  ["1935", "Нападение Италии на Эфиопию"],
+  ["1936–1939", "Гражданская война в Испании"],
+  ["1937–1945", "Японо-китайская война"],
+  ["1939–1945", "Вторая мировая война"],
+];
+
+// ── Состояние ────────────────────────────────────────────────────────────────
+let selectedCount = null;
+let selectedType = null;
+let questions = [];
+let currentIdx = 0;
+let score = 0;
+let sessionLog = []; // {question, mode, correctDate, correctEvent, chosenText, isCorrect}
+
+// ── Telegram WebApp ──────────────────────────────────────────────────────────
+if (window.Telegram && window.Telegram.WebApp) {
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+}
+
+// ── Утилиты ──────────────────────────────────────────────────────────────────
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function yearToInt(s) {
+  const m = s.match(/\d+/);
+  return m ? parseInt(m[0]) : -9999;
+}
+
+function smartDistractors(correctDate, correctEvent, mode, n = 3) {
+  const correctYear = yearToInt(correctDate);
+  let pool = ALL_DATES.filter(([d, e]) => !(d === correctDate && e === correctEvent));
+  pool.sort((a, b) => Math.abs(yearToInt(a[0]) - correctYear) - Math.abs(yearToInt(b[0]) - correctYear));
+
+  const seenDates = new Set([correctDate]);
+  const seenEvents = new Set([correctEvent]);
+  const result = [];
+
+  for (const [d, e] of pool) {
+    if (mode === 'date') {
+      if (!seenDates.has(d)) { result.push([d, e]); seenDates.add(d); }
+    } else {
+      if (!seenEvents.has(e)) { result.push([d, e]); seenEvents.add(e); }
+    }
+    if (result.length === n) break;
+  }
+  return result.slice(0, n);
+}
+
+function buildQuestion(item, mode) {
+  const [correctDate, correctEvent] = item;
+  const distractors = smartDistractors(correctDate, correctEvent, mode);
+
+  let questionText, options;
+  if (mode === 'date') {
+    questionText = correctEvent;
+    options = [[correctDate, true], ...distractors.map(([d]) => [d, false])];
+  } else {
+    questionText = correctDate;
+    options = [[correctEvent, true], ...distractors.map(([, e]) => [e, false])];
+  }
+
+  return {
+    questionText,
+    mode,
+    options: shuffle(options),
+    correctDate,
+    correctEvent,
+  };
+}
+
+// ── Меню ─────────────────────────────────────────────────────────────────────
+function selectCount(val) {
+  selectedCount = val;
+  document.querySelectorAll('[id^="cnt-"]').forEach(b => b.classList.remove('selected'));
+  document.getElementById('cnt-' + val).classList.add('selected');
+  updateStartBtn();
+}
+
+function selectType(val) {
+  selectedType = val;
+  document.querySelectorAll('[id^="type-"]').forEach(b => b.classList.remove('selected'));
+  document.getElementById('type-' + val).classList.add('selected');
+  updateStartBtn();
+}
+
+function updateStartBtn() {
+  document.getElementById('start-btn').disabled = !(selectedCount && selectedType);
+}
+
+// ── Квиз ─────────────────────────────────────────────────────────────────────
+function startQuiz() {
+  const count = selectedCount === 'all' ? ALL_DATES.length : selectedCount;
+  const pool = shuffle(ALL_DATES).slice(0, Math.min(count, ALL_DATES.length));
+
+  questions = pool.map(item => {
+    const mode = selectedType === 'mixed'
+      ? (Math.random() < 0.5 ? 'date' : 'event')
+      : selectedType;
+    return buildQuestion(item, mode);
+  });
+
+  currentIdx = 0;
+  score = 0;
+  sessionLog = [];
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentIdx];
+  const total = questions.length;
+
+  // Progress
+  document.getElementById('progress-label').textContent = `Вопрос ${currentIdx + 1} из ${total}`;
+  document.getElementById('progress-score').textContent = `✓ ${score}`;
+  document.getElementById('progress-fill').style.width = `${(currentIdx / total) * 100}%`;
+
+  // Badge
+  const badge = document.getElementById('question-badge');
+  if (q.mode === 'date') {
+    badge.textContent = '📖 Событие → дата';
+  } else {
+    badge.textContent = '📅 Дата → событие';
+  }
+
+  // Question
+  document.getElementById('question-text').textContent = q.questionText;
+
+  // Answers
+  const list = document.getElementById('answers-list');
+  list.innerHTML = '';
+  const labels = ['A', 'B', 'C', 'D'];
+  q.options.forEach(([text, isCorrect], i) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-card';
+    btn.innerHTML = `<span class="answer-label">${labels[i]}</span><span class="answer-text">${text}</span>`;
+    btn.onclick = () => handleAnswer(i, text, isCorrect);
+    list.appendChild(btn);
+  });
+
+  // Hide feedback & next
+  const fb = document.getElementById('feedback-bar');
+  fb.className = 'feedback-bar';
+  document.getElementById('next-btn').className = 'next-btn';
+}
+
+function handleAnswer(idx, chosenText, isCorrect) {
+  const q = questions[currentIdx];
+  const cards = document.querySelectorAll('.answer-card');
+
+  // Disable all
+  cards.forEach(c => c.disabled = true);
+
+  // Mark chosen
+  if (isCorrect) {
+    cards[idx].classList.add('correct');
+    score++;
+  } else {
+    cards[idx].classList.add('wrong');
+    // Show correct
+    q.options.forEach(([, ic], i) => {
+      if (ic) cards[i].classList.add('correct');
+    });
+  }
+
+  // Feedback
+  const fb = document.getElementById('feedback-bar');
+  const fbTitle = document.getElementById('fb-title');
+  const fbPair = document.getElementById('fb-pair');
+
+  if (isCorrect) {
+    fb.className = 'feedback-bar correct-fb show';
+    fbTitle.textContent = '✅ Верно!';
+  } else {
+    fb.className = 'feedback-bar wrong-fb show';
+    fbTitle.textContent = '❌ Неверно!';
+  }
+  fbPair.innerHTML = `<span>📅 ${q.correctDate}</span><br><span>📖 ${q.correctEvent}</span>`;
+
+  // Log
+  sessionLog.push({
+    questionText: q.questionText,
+    mode: q.mode,
+    correctDate: q.correctDate,
+    correctEvent: q.correctEvent,
+    chosenText,
+    isCorrect,
+  });
+
+  // Show next
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.className = 'next-btn show';
+  nextBtn.textContent = currentIdx + 1 < questions.length ? 'Следующий →' : 'Посмотреть итог →';
+}
+
+function nextQuestion() {
+  currentIdx++;
+  if (currentIdx < questions.length) {
+    renderQuestion();
+    window.scrollTo(0, 0);
+  } else {
+    showResults();
+  }
+}
+
+// ── Результаты ────────────────────────────────────────────────────────────────
+function showResults() {
+  const total = questions.length;
+  const wrong = total - score;
+  const pct = Math.round(score / total * 100);
+
+  // Emoji & title
+  let emoji, title;
+  if (pct >= 90) { emoji = '🏆'; title = 'Отлично!'; }
+  else if (pct >= 70) { emoji = '👍'; title = 'Хорошо!'; }
+  else if (pct >= 50) { emoji = '📈'; title = 'Неплохо!'; }
+  else { emoji = '📚'; title = 'Нужно повторить!'; }
+
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-subtitle').textContent = `${score} из ${total} правильных ответов`;
+  document.getElementById('stat-correct').textContent = score;
+  document.getElementById('stat-wrong').textContent = wrong;
+  document.getElementById('stat-pct').textContent = pct + '%';
+
+  // Review list
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '';
+
+  sessionLog.forEach((log, i) => {
+    const div = document.createElement('div');
+    div.className = `review-item ${log.isCorrect ? 'review-correct' : 'review-wrong'}`;
+
+    const badgeText = log.isCorrect ? '✓ Верно' : '✗ Неверно';
+    const modeText = log.mode === 'date' ? 'Событие → дата' : 'Дата → событие';
+
+    let answersHtml = '';
+    if (log.isCorrect) {
+      answersHtml = `<div class="review-answer ra-correct"><span class="ra-icon">✓</span><span>${log.chosenText}</span></div>`;
+    } else {
+      const correctAnswer = log.mode === 'date' ? log.correctDate : log.correctEvent;
+      answersHtml = `
+        <div class="review-answer ra-wrong"><span class="ra-icon">✗</span><span>Ваш ответ: ${log.chosenText}</span></div>
+        <div class="review-answer ra-correct"><span class="ra-icon">✓</span><span>Верно: ${correctAnswer}</span></div>
+      `;
+    }
+
+    div.innerHTML = `
+      <div class="review-item-header">
+        <span class="review-badge">${badgeText}</span>
+        <span style="font-size:12px;color:var(--hint)">${modeText}</span>
+      </div>
+      <div class="review-question">${log.questionText}</div>
+      <div class="review-answers">${answersHtml}</div>
+    `;
+    reviewList.appendChild(div);
+  });
+
+  showScreen('results');
+  window.scrollTo(0, 0);
+}
+
+function restartQuiz() {
+  startQuiz();
+}
+
+function showMenu() {
+  showScreen('menu');
+}
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+</script>
+</body>
+</html>
