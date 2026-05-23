@@ -6,7 +6,7 @@ logging.basicConfig(level=logging.INFO)
 TOKEN = "8782165712:AAHCXlt36OLeJDUDcCEOKZ1KombhwU4IHlQ"
 
 # ← Сюда вставь свой URL после деплоя на Railway
-WEBAPP_URL = "https://YOUR-APP.railway.app"
+WEBAPP_URL = "https://tgbot2-production-da1e.up.railway.app"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = InlineKeyboardMarkup([[
