@@ -811,22 +811,23 @@ function handleAnswer(idx, chosenText, isCorrect) {
     fb.className = 'feedback-bar wrong-fb show';
     fbTitle.textContent = '❌ Неверно!';
   }
-  // показать соответствия всех вариантов строго из базы
+
+// показать все связанные события/даты из базы
 let allPairs = '';
 
-q.options.forEach(([text]) => {
-  if (q.mode === 'event') {
-    const pair = ALL_DATES.find(([d, e]) => e === text);
-    if (pair) {
-      allPairs += `<div>📅 <b>${pair[0]}</b> — ${pair[1]}</div>`;
-    }
-  } else {
-    const pair = ALL_DATES.find(([d, e]) => d === text);
-    if (pair) {
-      allPairs += `<div>📖 <b>${pair[0]}</b> — ${pair[1]}</div>`;
-    }
-  }
-});
+if (q.mode === 'date') {
+  const relatedEvents = ALL_DATES.filter(([d]) => d === q.correctDate);
+
+  relatedEvents.forEach(([d, e]) => {
+    allPairs += `<div>📅 <b>${d}</b> — ${e}</div>`;
+  });
+} else {
+  const relatedDates = ALL_DATES.filter(([, e]) => e === q.correctEvent);
+
+  relatedDates.forEach(([d, e]) => {
+    allPairs += `<div>📖 <b>${d}</b> — ${e}</div>`;
+  });
+}
 
 fbPair.innerHTML = allPairs;
 
