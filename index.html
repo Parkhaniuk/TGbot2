@@ -644,7 +644,27 @@ function yearToInt(s) {
 
 function smartDistractors(correctDate, correctEvent, mode, n = 3) {
   const correctYear = yearToInt(correctDate);
-  let pool = ALL_DATES.filter(([d, e]) => !(d === correctDate && e === correctEvent));
+
+  // Все даты, которые считаются "правильными" для данного вопроса
+  // (одна дата может иметь несколько событий и наоборот)
+  const allCorrectDates = new Set(
+    ALL_DATES.filter(([, e]) => e === correctEvent).map(([d]) => d)
+  );
+  const allCorrectEvents = new Set(
+    ALL_DATES.filter(([d]) => d === correctDate).map(([, e]) => e)
+  );
+
+  // Исключаем все записи, которые могут считаться правильным ответом
+  let pool = ALL_DATES.filter(([d, e]) => {
+    if (mode === 'date') {
+      // Дистрактор — другая дата: исключаем все даты событий совпадающих с правильным
+      return !allCorrectDates.has(d) && !allCorrectEvents.has(e);
+    } else {
+      // Дистрактор — другое событие: исключаем все события той же даты
+      return !allCorrectEvents.has(e) && !allCorrectDates.has(d);
+    }
+  });
+
   pool.sort((a, b) => Math.abs(yearToInt(a[0]) - correctYear) - Math.abs(yearToInt(b[0]) - correctYear));
 
   const seenDates = new Set([correctDate]);
