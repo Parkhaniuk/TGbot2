@@ -811,7 +811,24 @@ function handleAnswer(idx, chosenText, isCorrect) {
     fb.className = 'feedback-bar wrong-fb show';
     fbTitle.textContent = '❌ Неверно!';
   }
-  fbPair.innerHTML = `<span>📅 ${q.correctDate}</span><br><span>📖 ${q.correctEvent}</span>`;
+  // показать соответствия всех вариантов строго из базы
+let allPairs = '';
+
+q.options.forEach(([text]) => {
+  if (q.mode === 'event') {
+    const pair = ALL_DATES.find(([d, e]) => e === text);
+    if (pair) {
+      allPairs += `<div>📅 <b>${pair[0]}</b> — ${pair[1]}</div>`;
+    }
+  } else {
+    const pair = ALL_DATES.find(([d, e]) => d === text);
+    if (pair) {
+      allPairs += `<div>📖 <b>${pair[0]}</b> — ${pair[1]}</div>`;
+    }
+  }
+});
+
+fbPair.innerHTML = allPairs;
 
   // Log
   sessionLog.push({
