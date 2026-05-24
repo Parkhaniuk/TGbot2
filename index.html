@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>История: Даты</title>
+<title>История</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root {
@@ -13,457 +13,299 @@
     --hint: var(--tg-theme-hint-color, #8e8e93);
     --accent: var(--tg-theme-button-color, #3478f6);
     --accent-text: var(--tg-theme-button-text-color, #ffffff);
-    --link: var(--tg-theme-link-color, #3478f6);
     --green: #34c759;
     --red: #ff3b30;
-    --yellow: #ffd60a;
     --radius: 16px;
     --radius-sm: 12px;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-  body {
-    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  .screen { display: none; flex-direction: column; min-height: 100vh; padding: 0 0 40px; }
+  .screen.active { display: flex; animation: slideUp 0.22s ease; }
+  @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 
-  /* ── Screens ── */
-  .screen { display: none; flex-direction: column; min-height: 100vh; padding: 0 0 32px; }
-  .screen.active { display: flex; }
+  /* ── Home ── */
+  .home-hero { padding: 48px 20px 28px; text-align: center; }
+  .home-hero .emoji { font-size: 64px; margin-bottom: 14px; }
+  .home-hero h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .home-hero p { font-size: 15px; color: var(--hint); line-height: 1.5; }
 
-  /* ── Header ── */
-  .header {
-    padding: 20px 20px 0;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .header-back {
-    width: 36px; height: 36px;
+  .mode-cards { padding: 0 16px; display: flex; flex-direction: column; gap: 12px; }
+  .mode-card {
     background: var(--bg2);
-    border-radius: 50%;
-    border: none;
-    color: var(--accent);
-    font-size: 18px;
+    border-radius: var(--radius);
+    padding: 20px;
     cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
+    display: flex; align-items: center; gap: 16px;
+    border: 2px solid transparent;
+    transition: all 0.15s;
   }
-  .header-title { font-size: 17px; font-weight: 600; }
+  .mode-card:active { transform: scale(0.98); }
+  .mode-card-icon { font-size: 40px; flex-shrink: 0; }
+  .mode-card-body { flex: 1; }
+  .mode-card-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .mode-card-desc { font-size: 13px; color: var(--hint); line-height: 1.4; }
+  .mode-card-arrow { font-size: 20px; color: var(--hint); }
 
-  /* ── Menu Screen ── */
-  .menu-hero {
-    padding: 32px 20px 24px;
-    text-align: center;
+  /* ── Menu (общий) ── */
+  .menu-hero { padding: 24px 20px 20px; text-align: center; }
+  .menu-hero .emoji { font-size: 48px; margin-bottom: 10px; }
+  .menu-hero h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .menu-hero p { font-size: 14px; color: var(--hint); }
+
+  .back-btn {
+    margin: 16px 16px 0;
+    background: var(--bg2);
+    color: var(--hint);
+    border: none; border-radius: var(--radius-sm);
+    padding: 10px 16px; font-size: 14px; font-weight: 500;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    transition: opacity 0.15s;
   }
-  .menu-hero .emoji { font-size: 56px; margin-bottom: 12px; }
-  .menu-hero h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
-  .menu-hero p { font-size: 15px; color: var(--hint); }
+  .back-btn:active { opacity: 0.7; }
 
   .section-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--hint);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 0 20px;
-    margin: 20px 0 8px;
+    font-size: 12px; font-weight: 600; color: var(--hint);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 0 20px; margin: 18px 0 8px;
   }
-
-  .options-group {
-    padding: 0 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .option-row {
-    display: flex;
-    gap: 8px;
-  }
-
+  .options-group { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+  .option-row { display: flex; gap: 8px; }
   .opt-btn {
-    flex: 1;
-    background: var(--bg2);
-    border: 2px solid transparent;
-    border-radius: var(--radius-sm);
-    padding: 14px 12px;
-    color: var(--text);
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
+    flex: 1; background: var(--bg2); border: 2px solid transparent;
+    border-radius: var(--radius-sm); padding: 13px 10px;
+    color: var(--text); font-size: 14px; font-weight: 500;
+    cursor: pointer; text-align: center; transition: all 0.15s ease;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
   }
-  .opt-btn .opt-icon { font-size: 22px; }
-  .opt-btn .opt-label { font-size: 13px; color: var(--hint); }
-  .opt-btn.selected {
-    border-color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 15%, var(--bg2));
-    color: var(--accent);
-  }
+  .opt-btn .opt-icon { font-size: 20px; }
+  .opt-btn .opt-label { font-size: 12px; color: var(--hint); }
+  .opt-btn.selected { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, var(--bg2)); color: var(--accent); }
   .opt-btn.selected .opt-label { color: var(--accent); opacity: 0.7; }
 
   .start-btn {
-    margin: 24px 16px 0;
-    background: var(--accent);
-    color: var(--accent-text);
-    border: none;
-    border-radius: var(--radius);
-    padding: 16px;
-    font-size: 17px;
-    font-weight: 600;
-    cursor: pointer;
-    width: calc(100% - 32px);
-    transition: opacity 0.15s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    margin: 20px 16px 0;
+    background: var(--accent); color: var(--accent-text);
+    border: none; border-radius: var(--radius);
+    padding: 16px; font-size: 17px; font-weight: 600;
+    cursor: pointer; width: calc(100% - 32px);
+    transition: opacity 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   .start-btn:active { opacity: 0.8; }
   .start-btn:disabled { opacity: 0.4; cursor: default; }
 
-  /* ── Quiz Screen ── */
-  .progress-bar-wrap {
-    padding: 16px 20px 0;
-  }
-  .progress-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
+  /* ── Quiz ── */
+  .progress-bar-wrap { padding: 16px 20px 0; }
+  .progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .progress-label { font-size: 14px; color: var(--hint); }
-  .progress-score {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--green);
-  }
-  .progress-bar {
-    height: 4px;
-    background: var(--bg2);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 2px;
-    transition: width 0.4s ease;
-  }
+  .progress-score { font-size: 14px; font-weight: 600; color: var(--green); }
+  .progress-bar { height: 4px; background: var(--bg2); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
 
-  .question-card {
-    margin: 16px 16px 0;
-    background: var(--bg2);
-    border-radius: var(--radius);
-    padding: 20px;
-  }
+  .question-card { margin: 14px 16px 0; background: var(--bg2); border-radius: var(--radius); padding: 18px; }
   .question-type-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+    display: inline-flex; align-items: center; gap: 5px;
     background: color-mix(in srgb, var(--accent) 15%, transparent);
-    color: var(--accent);
-    border-radius: 8px;
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 12px;
+    color: var(--accent); border-radius: 8px;
+    padding: 4px 10px; font-size: 12px; font-weight: 600; margin-bottom: 10px;
   }
-  .question-text {
-    font-size: 16px;
-    line-height: 1.5;
-    font-weight: 500;
-  }
+  .question-text { font-size: 15px; line-height: 1.5; font-weight: 500; }
 
-  .answers-list {
-    padding: 12px 16px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
+  .answers-list { padding: 10px 16px 0; display: flex; flex-direction: column; gap: 9px; }
   .answer-card {
-    background: var(--bg2);
-    border: 2px solid transparent;
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    transition: all 0.15s ease;
-    text-align: left;
-    width: 100%;
-    color: var(--text);
-    font-size: 15px;
-    line-height: 1.4;
+    background: var(--bg2); border: 2px solid transparent;
+    border-radius: var(--radius-sm); padding: 13px 14px;
+    cursor: pointer; display: flex; align-items: flex-start; gap: 11px;
+    transition: all 0.15s ease; text-align: left; width: 100%;
+    color: var(--text); font-size: 14px; line-height: 1.4;
   }
   .answer-card:active:not(:disabled) { transform: scale(0.98); }
   .answer-label {
-    width: 28px; height: 28px;
-    border-radius: 8px;
-    background: var(--bg);
-    color: var(--hint);
-    font-size: 13px;
-    font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.15s;
+    width: 26px; height: 26px; border-radius: 7px;
+    background: var(--bg); color: var(--hint);
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .answer-text { flex: 1; padding-top: 4px; }
-
-  .answer-card.correct {
-    border-color: var(--green);
-    background: color-mix(in srgb, var(--green) 12%, var(--bg2));
-  }
-  .answer-card.correct .answer-label {
-    background: var(--green);
-    color: #fff;
-  }
-  .answer-card.wrong {
-    border-color: var(--red);
-    background: color-mix(in srgb, var(--red) 12%, var(--bg2));
-  }
-  .answer-card.wrong .answer-label {
-    background: var(--red);
-    color: #fff;
-  }
+  .answer-text { flex: 1; padding-top: 3px; }
+  .answer-card.correct { border-color: var(--green); background: color-mix(in srgb, var(--green) 12%, var(--bg2)); }
+  .answer-card.correct .answer-label { background: var(--green); color: #fff; }
+  .answer-card.wrong { border-color: var(--red); background: color-mix(in srgb, var(--red) 12%, var(--bg2)); }
+  .answer-card.wrong .answer-label { background: var(--red); color: #fff; }
   .answer-card:disabled { cursor: default; }
 
   .feedback-bar {
-    margin: 14px 16px 0;
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    font-size: 14px;
-    line-height: 1.5;
-    display: none;
+    margin: 12px 16px 0; border-radius: var(--radius-sm);
+    padding: 13px 15px; font-size: 14px; line-height: 1.5; display: none;
   }
   .feedback-bar.show { display: block; }
-  .feedback-bar.correct-fb {
-    background: color-mix(in srgb, var(--green) 12%, var(--bg2));
-    border-left: 3px solid var(--green);
-  }
-  .feedback-bar.wrong-fb {
-    background: color-mix(in srgb, var(--red) 10%, var(--bg2));
-    border-left: 3px solid var(--red);
-  }
+  .feedback-bar.correct-fb { background: color-mix(in srgb, var(--green) 12%, var(--bg2)); border-left: 3px solid var(--green); }
+  .feedback-bar.wrong-fb { background: color-mix(in srgb, var(--red) 10%, var(--bg2)); border-left: 3px solid var(--red); }
   .feedback-bar .fb-title { font-weight: 700; margin-bottom: 4px; }
   .feedback-bar .fb-pair { color: var(--hint); font-size: 13px; margin-top: 6px; }
   .feedback-bar .fb-pair span { color: var(--text); font-weight: 500; }
 
   .next-btn {
-    margin: 16px 16px 0;
-    background: var(--accent);
-    color: var(--accent-text);
-    border: none;
-    border-radius: var(--radius);
-    padding: 15px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    width: calc(100% - 32px);
-    display: none;
-    transition: opacity 0.15s;
+    margin: 14px 16px 0; background: var(--accent); color: var(--accent-text);
+    border: none; border-radius: var(--radius); padding: 15px; font-size: 16px;
+    font-weight: 600; cursor: pointer; width: calc(100% - 32px); display: none; transition: opacity 0.15s;
   }
   .next-btn.show { display: block; }
   .next-btn:active { opacity: 0.8; }
 
-  /* ── Results Screen ── */
-  .result-hero {
-    padding: 32px 20px 20px;
-    text-align: center;
-  }
-  .result-emoji { font-size: 64px; margin-bottom: 12px; }
-  .result-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
-  .result-subtitle { font-size: 15px; color: var(--hint); }
-
-  .result-stats {
-    margin: 0 16px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-  }
-  .stat-card {
-    background: var(--bg2);
-    border-radius: var(--radius-sm);
-    padding: 16px 8px;
-    text-align: center;
-  }
-  .stat-value { font-size: 26px; font-weight: 700; }
+  /* ── Results ── */
+  .result-hero { padding: 28px 20px 18px; text-align: center; }
+  .result-emoji { font-size: 60px; margin-bottom: 10px; }
+  .result-title { font-size: 22px; font-weight: 700; margin-bottom: 5px; }
+  .result-subtitle { font-size: 14px; color: var(--hint); }
+  .result-stats { margin: 0 16px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .stat-card { background: var(--bg2); border-radius: var(--radius-sm); padding: 14px 8px; text-align: center; }
+  .stat-value { font-size: 24px; font-weight: 700; }
   .stat-value.green { color: var(--green); }
   .stat-value.red { color: var(--red); }
   .stat-value.blue { color: var(--accent); }
-  .stat-label { font-size: 12px; color: var(--hint); margin-top: 2px; }
+  .stat-label { font-size: 11px; color: var(--hint); margin-top: 2px; }
 
-  .review-section {
-    margin: 20px 16px 0;
-  }
-  .review-title {
-    font-size: 17px;
-    font-weight: 700;
-    margin-bottom: 12px;
-    padding-left: 4px;
-  }
-  .review-item {
-    background: var(--bg2);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    border-left: 3px solid var(--hint);
-  }
+  .review-section { margin: 18px 16px 0; }
+  .review-title { font-size: 17px; font-weight: 700; margin-bottom: 10px; padding-left: 4px; }
+  .review-item { background: var(--bg2); border-radius: var(--radius-sm); padding: 13px 15px; margin-bottom: 9px; border-left: 3px solid var(--hint); }
   .review-item.review-correct { border-left-color: var(--green); }
   .review-item.review-wrong { border-left-color: var(--red); }
-  .review-item-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-  .review-badge {
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 6px;
-    background: color-mix(in srgb, var(--hint) 20%, transparent);
-    color: var(--hint);
-  }
-  .review-item.review-correct .review-badge {
-    background: color-mix(in srgb, var(--green) 20%, transparent);
-    color: var(--green);
-  }
-  .review-item.review-wrong .review-badge {
-    background: color-mix(in srgb, var(--red) 20%, transparent);
-    color: var(--red);
-  }
-  .review-question { font-size: 13px; color: var(--hint); margin-bottom: 6px; }
+  .review-item-header { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+  .review-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: color-mix(in srgb, var(--hint) 20%, transparent); color: var(--hint); }
+  .review-item.review-correct .review-badge { background: color-mix(in srgb, var(--green) 20%, transparent); color: var(--green); }
+  .review-item.review-wrong .review-badge { background: color-mix(in srgb, var(--red) 20%, transparent); color: var(--red); }
+  .review-question { font-size: 13px; color: var(--hint); margin-bottom: 5px; }
   .review-answers { display: flex; flex-direction: column; gap: 4px; }
-  .review-answer {
-    font-size: 14px;
-    padding: 6px 10px;
-    border-radius: 8px;
-    display: flex;
-    align-items: flex-start;
-    gap: 6px;
-  }
+  .review-answer { font-size: 13px; padding: 5px 9px; border-radius: 7px; display: flex; align-items: flex-start; gap: 6px; }
   .review-answer.ra-correct { background: color-mix(in srgb, var(--green) 15%, transparent); color: var(--green); }
   .review-answer.ra-wrong { background: color-mix(in srgb, var(--red) 15%, transparent); color: var(--red); }
   .review-answer .ra-icon { flex-shrink: 0; }
 
-  .result-actions {
-    padding: 20px 16px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .btn-primary {
-    background: var(--accent);
-    color: var(--accent-text);
-    border: none;
-    border-radius: var(--radius);
-    padding: 15px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    width: 100%;
-    transition: opacity 0.15s;
-  }
+  .result-actions { padding: 18px 16px 0; display: flex; flex-direction: column; gap: 10px; }
+  .btn-primary { background: var(--accent); color: var(--accent-text); border: none; border-radius: var(--radius); padding: 15px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: opacity 0.15s; }
   .btn-primary:active { opacity: 0.8; }
-  .btn-secondary {
-    background: var(--bg2);
-    color: var(--text);
-    border: none;
-    border-radius: var(--radius);
-    padding: 15px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    width: 100%;
-    transition: opacity 0.15s;
-  }
+  .btn-secondary { background: var(--bg2); color: var(--text); border: none; border-radius: var(--radius); padding: 15px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: opacity 0.15s; }
   .btn-secondary:active { opacity: 0.8; }
-
-  /* ── Animations ── */
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .screen.active { animation: slideUp 0.25s ease; }
-
-  @keyframes pop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
-  .answer-card.correct, .answer-card.wrong { animation: pop 0.2s ease; }
 </style>
 </head>
 <body>
 
-<!-- ══ MENU SCREEN ══ -->
-<div class="screen active" id="screen-menu">
+<!-- ══ HOME SCREEN ══ -->
+<div class="screen active" id="screen-home">
+  <div class="home-hero">
+    <div class="emoji">📜</div>
+    <h1>История</h1>
+    <p>Проверь знание дат и личностей.<br>Выбери раздел для тренировки:</p>
+  </div>
+  <div class="mode-cards">
+    <div class="mode-card" onclick="goToMenu('dates')">
+      <div class="mode-card-icon">📅</div>
+      <div class="mode-card-body">
+        <div class="mode-card-title">Даты</div>
+        <div class="mode-card-desc">Ключевые исторические события и их даты</div>
+      </div>
+      <div class="mode-card-arrow">›</div>
+    </div>
+    <div class="mode-card" onclick="goToMenu('persons')">
+      <div class="mode-card-icon">👤</div>
+      <div class="mode-card-body">
+        <div class="mode-card-title">Личности</div>
+        <div class="mode-card-desc">Исторические деятели и их достижения</div>
+      </div>
+      <div class="mode-card-arrow">›</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DATES MENU ══ -->
+<div class="screen" id="screen-dates-menu">
+  <button class="back-btn" onclick="showScreen('home')">← Назад</button>
   <div class="menu-hero">
     <div class="emoji">📅</div>
     <h1>Даты истории</h1>
-    <p>Проверь знания ключевых исторических дат</p>
+    <p>Проверь знание ключевых дат</p>
   </div>
 
   <div class="section-label">Количество вопросов</div>
   <div class="options-group">
     <div class="option-row">
-      <button class="opt-btn" id="cnt-10" onclick="selectCount(10)">
-        <span class="opt-icon">🔟</span>
-        <span>10</span>
-        <span class="opt-label">быстро</span>
+      <button class="opt-btn" id="d-cnt-10" onclick="selectCount(10,'d')">
+        <span class="opt-icon">🔟</span><span>10</span><span class="opt-label">быстро</span>
       </button>
-      <button class="opt-btn" id="cnt-20" onclick="selectCount(20)">
-        <span class="opt-icon">2️⃣0️⃣</span>
-        <span>20</span>
-        <span class="opt-label">средне</span>
+      <button class="opt-btn" id="d-cnt-20" onclick="selectCount(20,'d')">
+        <span class="opt-icon">2️⃣0️⃣</span><span>20</span><span class="opt-label">средне</span>
       </button>
-      <button class="opt-btn" id="cnt-30" onclick="selectCount(30)">
-        <span class="opt-icon">🎯</span>
-        <span>30</span>
-        <span class="opt-label">серьёзно</span>
+      <button class="opt-btn" id="d-cnt-30" onclick="selectCount(30,'d')">
+        <span class="opt-icon">🎯</span><span>30</span><span class="opt-label">серьёзно</span>
       </button>
     </div>
-    <button class="opt-btn" id="cnt-all" onclick="selectCount('all')" style="flex-direction:row;justify-content:center;gap:8px;padding:14px;">
-      <span class="opt-icon">📚</span>
-      <span>Все даты (~80)</span>
-      <span class="opt-label">полный курс</span>
+    <button class="opt-btn" id="d-cnt-all" onclick="selectCount('all','d')" style="flex-direction:row;justify-content:center;gap:8px;padding:13px;">
+      <span class="opt-icon">📚</span><span>Все даты (~80)</span>
     </button>
   </div>
 
   <div class="section-label">Тип вопросов</div>
   <div class="options-group">
     <div class="option-row">
-      <button class="opt-btn" id="type-event" onclick="selectType('event')">
-        <span class="opt-icon">📅</span>
-        <span>Дата → событие</span>
+      <button class="opt-btn" id="d-type-event" onclick="selectType('event','d')">
+        <span class="opt-icon">📅</span><span>Дата → событие</span>
       </button>
-      <button class="opt-btn" id="type-date" onclick="selectType('date')">
-        <span class="opt-icon">📖</span>
-        <span>Событие → дата</span>
+      <button class="opt-btn" id="d-type-date" onclick="selectType('date','d')">
+        <span class="opt-icon">📖</span><span>Событие → дата</span>
       </button>
     </div>
-    <button class="opt-btn" id="type-mixed" onclick="selectType('mixed')" style="flex-direction:row;justify-content:center;gap:8px;padding:14px;">
-      <span class="opt-icon">🎲</span>
-      <span>Смешанный режим</span>
+    <button class="opt-btn" id="d-type-mixed" onclick="selectType('mixed','d')" style="flex-direction:row;justify-content:center;gap:8px;padding:13px;">
+      <span class="opt-icon">🎲</span><span>Смешанный режим</span>
     </button>
   </div>
 
-  <button class="start-btn" id="start-btn" onclick="startQuiz()" disabled>
-    Начать →
-  </button>
+  <button class="start-btn" id="d-start-btn" onclick="startQuiz('dates')" disabled>Начать →</button>
+</div>
+
+<!-- ══ PERSONS MENU ══ -->
+<div class="screen" id="screen-persons-menu">
+  <button class="back-btn" onclick="showScreen('home')">← Назад</button>
+  <div class="menu-hero">
+    <div class="emoji">👤</div>
+    <h1>Личности</h1>
+    <p>Проверь знание исторических деятелей</p>
+  </div>
+
+  <div class="section-label">Количество вопросов</div>
+  <div class="options-group">
+    <div class="option-row">
+      <button class="opt-btn" id="p-cnt-10" onclick="selectCount(10,'p')">
+        <span class="opt-icon">🔟</span><span>10</span><span class="opt-label">быстро</span>
+      </button>
+      <button class="opt-btn" id="p-cnt-20" onclick="selectCount(20,'p')">
+        <span class="opt-icon">2️⃣0️⃣</span><span>20</span><span class="opt-label">средне</span>
+      </button>
+      <button class="opt-btn" id="p-cnt-30" onclick="selectCount(30,'p')">
+        <span class="opt-icon">🎯</span><span>30</span><span class="opt-label">серьёзно</span>
+      </button>
+    </div>
+    <button class="opt-btn" id="p-cnt-all" onclick="selectCount('all','p')" style="flex-direction:row;justify-content:center;gap:8px;padding:13px;">
+      <span class="opt-icon">📚</span><span>Все личности (~150)</span>
+    </button>
+  </div>
+
+  <div class="section-label">Тип вопросов</div>
+  <div class="options-group">
+    <div class="option-row">
+      <button class="opt-btn" id="p-type-desc" onclick="selectType('desc','p')">
+        <span class="opt-icon">👤</span><span>Имя → описание</span>
+      </button>
+      <button class="opt-btn" id="p-type-name" onclick="selectType('name','p')">
+        <span class="opt-icon">🔍</span><span>Описание → имя</span>
+      </button>
+    </div>
+    <button class="opt-btn" id="p-type-mixed" onclick="selectType('mixed','p')" style="flex-direction:row;justify-content:center;gap:8px;padding:13px;">
+      <span class="opt-icon">🎲</span><span>Смешанный режим</span>
+    </button>
+  </div>
+
+  <button class="start-btn" id="p-start-btn" onclick="startQuiz('persons')" disabled>Начать →</button>
 </div>
 
 <!-- ══ QUIZ SCREEN ══ -->
@@ -473,23 +315,17 @@
       <span class="progress-label" id="progress-label">Вопрос 1 из 10</span>
       <span class="progress-score" id="progress-score">✓ 0</span>
     </div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   </div>
-
   <div class="question-card">
     <div class="question-type-badge" id="question-badge">📅 Дата</div>
     <div class="question-text" id="question-text"></div>
   </div>
-
   <div class="answers-list" id="answers-list"></div>
-
   <div class="feedback-bar" id="feedback-bar">
     <div class="fb-title" id="fb-title"></div>
     <div class="fb-pair" id="fb-pair"></div>
   </div>
-
   <button class="next-btn" id="next-btn" onclick="nextQuestion()">Следующий →</button>
 </div>
 
@@ -498,37 +334,27 @@
   <div class="result-hero">
     <div class="result-emoji" id="result-emoji">🏆</div>
     <div class="result-title" id="result-title">Отлично!</div>
-    <div class="result-subtitle" id="result-subtitle">Результат сессии</div>
+    <div class="result-subtitle" id="result-subtitle"></div>
   </div>
-
   <div class="result-stats">
-    <div class="stat-card">
-      <div class="stat-value green" id="stat-correct">0</div>
-      <div class="stat-label">Верно</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value red" id="stat-wrong">0</div>
-      <div class="stat-label">Неверно</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value blue" id="stat-pct">0%</div>
-      <div class="stat-label">Результат</div>
-    </div>
+    <div class="stat-card"><div class="stat-value green" id="stat-correct">0</div><div class="stat-label">Верно</div></div>
+    <div class="stat-card"><div class="stat-value red" id="stat-wrong">0</div><div class="stat-label">Неверно</div></div>
+    <div class="stat-card"><div class="stat-value blue" id="stat-pct">0%</div><div class="stat-label">Результат</div></div>
   </div>
-
   <div class="review-section">
     <div class="review-title">Разбор ответов</div>
     <div id="review-list"></div>
   </div>
-
   <div class="result-actions">
     <button class="btn-primary" onclick="restartQuiz()">🔄 Повторить</button>
-    <button class="btn-secondary" onclick="showMenu()">🏠 В меню</button>
+    <button class="btn-secondary" onclick="showScreen('home')">🏠 В меню</button>
   </div>
 </div>
 
 <script>
-// ── Данные ──────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// БАЗА: ДАТЫ [дата, событие]
+// ═══════════════════════════════════════════════════════════
 const ALL_DATES = [
   ["4 тыс. до н.э.", "Возникновение Шумерского государства (первого государства в мире)"],
   ["4–3 тыс. до н.э.", "Объединение номов в Верхнем Египте под властью Менеса"],
@@ -613,21 +439,236 @@ const ALL_DATES = [
   ["1939–1945", "Вторая мировая война"],
 ];
 
-// ── Состояние ────────────────────────────────────────────────────────────────
-let selectedCount = null;
-let selectedType = null;
+// ═══════════════════════════════════════════════════════════
+// БАЗА: ЛИЧНОСТИ [имя, описание]
+// ═══════════════════════════════════════════════════════════
+const ALL_PERSONS = [
+  // Древность
+  ["Геродот", "Древнегреческий историк, «отец истории»"],
+  ["Полибий", "Древнегреческий историк, автор первой «Всеобщей истории»"],
+  ["Ч. Дарвин", "Английский учёный, сформулировавший теорию эволюции в книге «Происхождение видов»"],
+  ["Ромул", "Основатель Рима"],
+  ["Гомер", "Автор древнегреческих поэм «Илиада» и «Одиссея»"],
+  ["Гиппократ", "Древнегреческий врач"],
+  ["Ромул Август", "Последний римский император"],
+  // Раннее Средневековье
+  ["Хлодвиг", "Король франков в 5 веке, подчинивший почти всю Галлию"],
+  ["Карл Великий", "Император франкского государства, восстановивший его единство"],
+  ["Оттон I", "Первый правитель Священной Римской империи"],
+  ["Юстиниан", "Император Византии, создавший «гражданский кодекс»"],
+  ["Мухаммед", "Посланник и пророк ислама"],
+  ["Чингисхан", "Правитель Монголии, при котором она достигла наибольшего могущества"],
+  ["Иннокентий III", "Папа Римский, при котором Римская церковь достигла наибольшего могущества"],
+  ["Феодосий II", "Византийский император, основавший университет в Константинополе"],
+  ["Кирилл, Мефодий", "Создатели славянского алфавита"],
+  ["Лев Математик", "Учёный, один из основоположников алгебры"],
+  ["Е. Кесарийский", "Автор исторической хроники «Хроника»"],
+  ["П. Кесарийский", "Автор «Истории войн Юстиниана»"],
+  ["О. Хайям", "Персидский философ, математик, астроном и поэт"],
+  // Позднее Средневековье — деятели
+  ["Марко Поло", "Венецианец, совершивший многолетнее путешествие в Китай и Центральную Азию, автор «Книги о разнообразии мира»"],
+  ["Роджер Бэкон", "Английский учёный, написал работы о природе света и цвета, разработал новые теории об увеличительных стёклах"],
+  ["Ибн Сина (Авиценна)", "Написал книгу «Канон врачебной науки»"],
+  ["Плиний Старший", "Назвал славян «венедами»"],
+  ["Ян Гус", "Чешский проповедник, мыслитель, религиозный реформатор"],
+  ["Исидор", "Митрополит Русской церкви, подписал акт об объединении церквей, последний митрополит в Москве, поставленным константинопольским патриархом"],
+  ["Иона", "Первый Митрополит Русской церкви русского происхождения"],
+  ["Иоганн Гутенберг", "Немецкий изобретатель, создал книгопечатный станок в 1445, напечатал первую книгу в 1455"],
+  // Деятели Возрождения
+  ["Эразм Роттердамский", "Голландский мыслитель, учёный и богослов эпохи Возрождения, автор «Похвалы глупости»"],
+  ["Франсуа Рабле", "Французский писатель, автор «Гаргантюа и Пантагрюэль»"],
+  ["Мигель де Сервантес", "Испанский писатель, автор «Дон Кихот»"],
+  ["Томас Мор", "Английский утопист, автор «Утопия»"],
+  ["Томмазо Кампанелла", "Итальянский утопист, автор «Город солнца»"],
+  ["Жан Боден", "Француз, представитель теории абсолютизма"],
+  ["Никколо Макиавелли", "Итальянский мыслитель, автор «Государь»"],
+  ["Уильям Шекспир", "Английский драматург"],
+  ["Рафаэль Санти", "Итальянский живописец"],
+  ["Микеланджело", "Итальянский живописец"],
+  ["Тициан Вечеллио", "Итальянский живописец"],
+  ["Питер Брейгель", "Нидерландский живописец"],
+  ["Альбрехт Дюрер", "Германский живописец"],
+  ["Ганс Гольбейн", "Германский живописец"],
+  ["Николай Коперник", "Создал учение об обращении Земли вокруг Солнца и вращении вокруг своей оси"],
+  ["Джордано Бруно", "Создал учение о безмерности, бесконечности и вечности Вселенной"],
+  ["Галилео Галилей", "Подтвердил гелиоцентрическую теорию Коперника"],
+  ["Леонардо да Винчи", "Итальянский художник, изобретатель, писатель"],
+  ["К. Острожский", "Основал Острожскую славяно-греко-латинскую академию"],
+  // Реформация
+  ["Мартин Лютер", "Немецкий христианский богослов, инициатор Реформации"],
+  ["Жан Кальвин", "«Женевский папа», сформулировал учение о предопределении и божественном суверенитете"],
+  ["Ульрих Цвингли", "Возглавил Реформацию в Швейцарии"],
+  ["Генрих VIII", "Король, инициатор Реформации в Англии"],
+  ["Мария Тюдор", "Английская королева, католичка, приход к власти ознаменован кровавыми столкновениями между протестантами и католиками"],
+  ["Елизавета I", "Английская королева, при которой окончательно сформировалась государственная англиканская церковь"],
+  ["Генрих IV", "Французский король, издание Нантского эдикта"],
+  ["Игнатий Лойола", "Создатель католического ордена иезуитов"],
+  // Просвещение
+  ["Вольтер", "Французский просветитель, выступал против тирании и неравенства, отстаивал свободу совести и слова"],
+  ["Ж.Ж. Руссо", "Французский просветитель, написал «Общественный договор»"],
+  ["Дени Дидро", "Французский просветитель, издал многотомную «Энциклопедию»"],
+  ["Иммануил Кант", "Немецкий философ, «Критика чистого разума»"],
+  ["Иоганн Гердер", "Немецкий просветитель, внёс вклад в развитие литературоведения, эстетики и теории языка"],
+  ["Готхольд Лессинг", "Немецкий просветитель, критика классицизма с позиции требований нового времени"],
+  ["Иоганн Гёте", "Немецкий писатель и поэт"],
+  ["Фридрих Шиллер", "Немецкий писатель и поэт"],
+  ["Иоганн Бах", "Немецкий композитор"],
+  ["Людвиг ван Бетховен", "Немецкий композитор"],
+  ["Джонатан Свифт", "«Гулливер в стране лилипутов»"],
+  ["Джон Локк", "«Опыт о человеческом разумении»"],
+  ["Исаак Ньютон", "Английский физик, математик и астроном"],
+  ["М. Ломоносов", "Русский учёный, выходец из поморских крестьян"],
+  ["А. Радищев", "«Путешествие из Петербурга в Москву», настаивал на вреде крепостного права и самодержавия"],
+  // Деятели ВКЛ
+  ["Альбрехт Гаштольд", "Канцлер ВКЛ, соавтор Статута 1529 года"],
+  ["Николай Радзивилл Чёрный", "Канцлер ВКЛ, участник подготовки Статута 1566 года, основатель первой в ВКЛ кальвинистской общины, меценат кальвинизма"],
+  ["Николай Радзивилл Рыжий", "Глава делегации ВКЛ на Люблинском сейме, победа на реке Улле"],
+  ["Остафий Волович", "Канцлер ВКЛ, один из руководителей комиссии третьей редакции Статута ВКЛ"],
+  ["Лев Сапега", "Подканцлер ВКЛ, один из руководителей комиссии третьей редакции Статута ВКЛ"],
+  ["Франциск Скорина", "Первопечатник, автор произведений: «Псалтырь», «Библия руска», «Малая подорожная книжица», «Апостол»"],
+  ["Н. Гусовский", "«Песнь о зубре»"],
+  ["С. Будный", "Издатель книги «Катехизис»"],
+  ["В. Тяпинский", "Перевёл на старобелорусский «Евангелие»"],
+  ["С. Соболь", "Опубликовал «Букварь»"],
+  ["Братья Мамоничи", "Издали Статут ВКЛ 1588"],
+  ["С. Полоцкий", "Автор «Обед душевный» и «Вечеря душевная»"],
+  ["К. Семенович", "Автор труда «Великое искусство артиллерии»"],
+  ["А. Коялович", "Автор произведения «История Литвы»"],
+  ["Г. Конисский", "Защитник православия, Могилевский архиепископ"],
+  ["М. Почобут-Одляницкий", "Математик, физик, ректор Главной школы ВКЛ"],
+  ["М. Смотрицкий", "Автор одной из славянских грамматик"],
+  ["Тадеуш Костюшко", "Инициатор восстания 1794 года"],
+  ["Якуб Ясинский", "Руководитель восстания 1794 года в ВКЛ"],
+  ["М. Ф. Чарторыйский", "Инициатор реформ в РП в 1760-е годы"],
+  ["Бона Сфорца", "Инициаторка волочной померы"],
+  ["Казимир Радзивилл (Рыбонька)", "Владелец Несвижа, отстроивший его после войны"],
+  ["Михаил Казимир Огинский", "Спонсор строительства водных каналов вт.п. 18 века"],
+  ["Матей Бутримович", "Инициатор строительства водных каналов"],
+  ["Антоний Тизенгауз", "Инициатор аграрной реформы королевских экономий"],
+  ["Петр Скарга", "Иезуит, книга «О единстве Церкви Божией»"],
+  ["Иосафат Кунцевич", "Витебский униатский священник, убитый в ходе антиуниатского восстания в Витебске 1623 года"],
+  // 19 век — мировые деятели
+  ["Дж. Уатт", "Создание паровой машины"],
+  ["Ф. де Рива", "Создание двигателя внутреннего сгорания"],
+  ["М. Фарадей", "Создание электродвигателя"],
+  ["К. Маркс", "Представитель социализма в Германии"],
+  ["Ф. Энгельс", "Представитель социализма в Германии"],
+  ["Дж. Гарибальди", "Деятель итальянского национального движения"],
+  ["Отто фон Бисмарк", "Инициатор объединения земель Германии, канцлер Германской империи"],
+  ["Симон Боливар", "Революционер, борец за независимость в Латинской Америке"],
+  // 19 век — деятели на территории Беларуси
+  ["М. Сперанский", "Российский чиновник, автор плана гос. преобразований «Введение к Уложению государственных законов»"],
+  ["П. Столыпин", "Председатель Совета министров РИ, инициатор столыпинской аграрной реформы"],
+  ["М. К. Огинский", "Разработал план создания автономии ВКЛ"],
+  ["Доминик Радзивилл", "Сторонник Наполеона в войне 1812"],
+  ["Иоахим Лелевель", "Руководитель восстания 1830-31 годов, демократическое направление"],
+  ["Кастусь Калиновский", "Руководитель восстания 1863-64 годов, глава Литовского провинциального комитета в Вильно, автор «Мужыцкай праўды»"],
+  ["Антон Луцкевич", "Создатель БСГ"],
+  ["Иван Луцкевич", "Создатель БСГ"],
+  // 19 век — белорусская культура
+  ["И. Носович", "«Словарь белорусского наречия»"],
+  ["В. Ластовский", "«Краткая история Беларуси»"],
+  ["Я. Барщевский", "«Шляхтич Завальня, или Беларусь в фантастических рассказах»"],
+  ["И. Домейко", "Знаменитый геолог, национальный герой Чили, уроженец Беларуси"],
+  ["С. Монюшко", "Композитор, музыка «Селянка», на которую была поставлена первая белорусская опера «Идиллия»"],
+  ["И. Буйницкий", "Первая белорусская профессиональная театральная труппа"],
+  ["Ф. Богушевич", "Писатель, «Дудка белорусская», «Смык белорусский», «Белорусы»"],
+  ["Я. Купала", "«А хто там ідзе», «Спадчына», «Павлинка», «Разоренное гнездо»"],
+  ["М. Богданович", "Автор сборника «Венок»"],
+  // 20 век
+  ["Б. Муссолини", "Основатель идеологии фашизма, итальянский диктатор 1922-1943 годов"],
+  ["Ф. Франко", "Инициатор гражданской войны в Испании, установил авторитарный режим в 1939 году"],
+  ["М. Ганди", "Лидер Национального конгресса в Индии, борец за независимость Индии"],
+  ["М. Кемаль Ататюрк", "Борец за независимость Турции, правитель, реформатор"],
+  ["Сунь Ятсен", "Создатель партии Гоминьдан в 1912 году"],
+  ["Л. Троцкий", "Революционер, автор идеи мировой социалистической революции"],
+  ["В. Ленин", "Революционер, руководитель Октябрьской революции"],
+  ["И. Сталин", "Правитель СССР (1924-1953), автор идеи автономии Советского Союза"],
+  // 20 век — Беларусь
+  ["А. Червяков", "Государственный деятель БССР, подписал Декларацию о создании СССР от БССР"],
+  ["В. Игнатовский", "Первый президент Белорусской академии наук"],
+  ["Ю. Гагарин", "Первый космонавт в космосе"],
+  ["К. Рокоссовский", "Руководитель 1-ого Белорусского фронта в 1944"],
+  ["П. Климук", "Белорусский лётчик-космонавт"],
+  ["В. Мулявин", "Создатель «Песняров»"],
+  // 21 век
+  ["С. Шушкевич", "Председатель Верховного Совета Республики Беларусь, подписавший «Соглашение о создании Содружества Независимых Государств»"],
+  ["М. Василевская", "Первая космонавтка Республики Беларусь (2024)"],
+  ["Д. Домрачева", "Трёхкратная олимпийская чемпионка, Герой Беларуси"],
+  // Древняя Русь — князья
+  ["Олег", "882–912 — Первый князь Древнерусского государства"],
+  ["Игорь", "912–945 — Князь, совершивший поход на Византию"],
+  ["Ольга", "945–964 — Княгиня, осуществила ряд реформ по упорядочению взимания дани с населения, ввела погосты"],
+  ["Святослав Игоревич", "964–972 — Князь, подчинил племя вятичей, нанёс поражение Хазарскому каганату, разгромил Болгарское царство, вёл войну с Византией на Балканах"],
+  ["Владимир Святославич", "980–1015 — Князь, крестил Русь, провёл административную, правовую, религиозную, оборонительную реформы"],
+  ["Ярослав Мудрый", "1019–1054 — Князь, принял свод законов «Русская правда»"],
+  ["Владимир Мономах", "1113–1125 — Князь, инициатор военных походов на степные народы Средней Азии"],
+  ["Мстислав Великий", "1125–1132 — Князь, после смерти которого началась раздробленность Древней Руси"],
+  // Полоцкое княжество
+  ["Рогволод", "960-е – 980 — Первый известный князь Полоцка"],
+  ["Всеслав Чародей", "1044–1101 — при нём княжество достигло наивысшего могущества, построил Софийский собор в Полоцке"],
+  ["Ефросинья Полоцкая", "Инициировала постройку монастырей и церквей в Полоцке, содействовала образованию, совершила паломничество в Иерусалим"],
+  ["Кирилл Туровский", "Первый из монахов совершил подвиг столпничества, был епископом, написал известные Слова К. Туровского"],
+  ["Лазарь Богша", "Изготовил Крест Ефросинии Полоцкой в 1161 году"],
+  ["Александр Невский", "Разгромил шведов в устье Невы, крестоносцев на Чудском озере"],
+  ["Игорь Святославич", "Черниговский князь, которому посвящено «Слово о полку Игореве»"],
+];
+
+// ═══════════════════════════════════════════════════════════
+// СОСТОЯНИЕ
+// ═══════════════════════════════════════════════════════════
+let currentModule = 'dates'; // 'dates' | 'persons'
+let selectedCount = { d: null, p: null };
+let selectedType  = { d: null, p: null };
 let questions = [];
 let currentIdx = 0;
 let score = 0;
-let sessionLog = []; // {question, mode, correctDate, correctEvent, chosenText, isCorrect}
+let sessionLog = [];
 
-// ── Telegram WebApp ──────────────────────────────────────────────────────────
 if (window.Telegram && window.Telegram.WebApp) {
   Telegram.WebApp.ready();
   Telegram.WebApp.expand();
 }
 
-// ── Утилиты ──────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// НАВИГАЦИЯ
+// ═══════════════════════════════════════════════════════════
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goToMenu(module) {
+  currentModule = module;
+  showScreen(module === 'dates' ? 'dates-menu' : 'persons-menu');
+}
+
+// ═══════════════════════════════════════════════════════════
+// ВЫБОР НАСТРОЕК
+// ═══════════════════════════════════════════════════════════
+function selectCount(val, prefix) {
+  selectedCount[prefix] = val;
+  document.querySelectorAll(`[id^="${prefix}-cnt-"]`).forEach(b => b.classList.remove('selected'));
+  document.getElementById(`${prefix}-cnt-${val}`).classList.add('selected');
+  updateStartBtn(prefix);
+}
+
+function selectType(val, prefix) {
+  selectedType[prefix] = val;
+  document.querySelectorAll(`[id^="${prefix}-type-"]`).forEach(b => b.classList.remove('selected'));
+  document.getElementById(`${prefix}-type-${val}`).classList.add('selected');
+  updateStartBtn(prefix);
+}
+
+function updateStartBtn(prefix) {
+  const btn = document.getElementById(prefix + '-start-btn');
+  btn.disabled = !(selectedCount[prefix] && selectedType[prefix]);
+}
+
+// ═══════════════════════════════════════════════════════════
+// УТИЛИТЫ
+// ═══════════════════════════════════════════════════════════
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -642,35 +683,23 @@ function yearToInt(s) {
   return m ? parseInt(m[0]) : -9999;
 }
 
-function smartDistractors(correctDate, correctEvent, mode, n = 3) {
+// ═══════════════════════════════════════════════════════════
+// ДИСТРАКТОРЫ ДЛЯ ДАТ
+// ═══════════════════════════════════════════════════════════
+function smartDistractorsDates(correctDate, correctEvent, mode, n = 3) {
   const correctYear = yearToInt(correctDate);
+  const allCorrectDates = new Set(ALL_DATES.filter(([,e]) => e === correctEvent).map(([d]) => d));
+  const allCorrectEvents = new Set(ALL_DATES.filter(([d]) => d === correctDate).map(([,e]) => e));
 
-  // Все даты, которые считаются "правильными" для данного вопроса
-  // (одна дата может иметь несколько событий и наоборот)
-  const allCorrectDates = new Set(
-    ALL_DATES.filter(([, e]) => e === correctEvent).map(([d]) => d)
-  );
-  const allCorrectEvents = new Set(
-    ALL_DATES.filter(([d]) => d === correctDate).map(([, e]) => e)
-  );
-
-  // Исключаем все записи, которые могут считаться правильным ответом
   let pool = ALL_DATES.filter(([d, e]) => {
-    if (mode === 'date') {
-      // Дистрактор — другая дата: исключаем все даты событий совпадающих с правильным
-      return !allCorrectDates.has(d) && !allCorrectEvents.has(e);
-    } else {
-      // Дистрактор — другое событие: исключаем все события той же даты
-      return !allCorrectEvents.has(e) && !allCorrectDates.has(d);
-    }
+    if (mode === 'date') return !allCorrectDates.has(d) && !allCorrectEvents.has(e);
+    else return !allCorrectEvents.has(e) && !allCorrectDates.has(d);
   });
-
   pool.sort((a, b) => Math.abs(yearToInt(a[0]) - correctYear) - Math.abs(yearToInt(b[0]) - correctYear));
 
   const seenDates = new Set([correctDate]);
   const seenEvents = new Set([correctEvent]);
   const result = [];
-
   for (const [d, e] of pool) {
     if (mode === 'date') {
       if (!seenDates.has(d)) { result.push([d, e]); seenDates.add(d); }
@@ -682,87 +711,108 @@ function smartDistractors(correctDate, correctEvent, mode, n = 3) {
   return result.slice(0, n);
 }
 
-function buildQuestion(item, mode) {
-  const [correctDate, correctEvent] = item;
-  const distractors = smartDistractors(correctDate, correctEvent, mode);
+// ═══════════════════════════════════════════════════════════
+// ДИСТРАКТОРЫ ДЛЯ ЛИЧНОСТЕЙ
+// ═══════════════════════════════════════════════════════════
+function smartDistractorsPersons(correctName, correctDesc, mode, n = 3) {
+  let pool = ALL_PERSONS.filter(([name, desc]) => !(name === correctName && desc === correctDesc));
+  pool = shuffle(pool);
 
+  const seenNames = new Set([correctName]);
+  const seenDescs = new Set([correctDesc]);
+  const result = [];
+  for (const [name, desc] of pool) {
+    if (mode === 'name') {
+      if (!seenNames.has(name)) { result.push([name, desc]); seenNames.add(name); }
+    } else {
+      if (!seenDescs.has(desc)) { result.push([name, desc]); seenDescs.add(desc); }
+    }
+    if (result.length === n) break;
+  }
+  return result.slice(0, n);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ПОСТРОЕНИЕ ВОПРОСОВ
+// ═══════════════════════════════════════════════════════════
+function buildDateQuestion(item, mode) {
+  const [correctDate, correctEvent] = item;
+  const distractors = smartDistractorsDates(correctDate, correctEvent, mode);
   let questionText, options;
   if (mode === 'date') {
     questionText = correctEvent;
     options = [[correctDate, true], ...distractors.map(([d]) => [d, false])];
   } else {
     questionText = correctDate;
-    options = [[correctEvent, true], ...distractors.map(([, e]) => [e, false])];
+    options = [[correctEvent, true], ...distractors.map(([,e]) => [e, false])];
+  }
+  return { questionText, mode, options: shuffle(options), correctDate, correctEvent, type: 'date' };
+}
+
+function buildPersonQuestion(item, mode) {
+  const [correctName, correctDesc] = item;
+  const distractors = smartDistractorsPersons(correctName, correctDesc, mode);
+  let questionText, options;
+  if (mode === 'name') {
+    // показываем имя — выбираем описание
+    questionText = correctName;
+    options = [[correctDesc, true], ...distractors.map(([,d]) => [d, false])];
+  } else {
+    // показываем описание — выбираем имя
+    questionText = correctDesc;
+    options = [[correctName, true], ...distractors.map(([n]) => [n, false])];
+  }
+  return { questionText, mode, options: shuffle(options), correctName, correctDesc, type: 'person' };
+}
+
+// ═══════════════════════════════════════════════════════════
+// ЗАПУСК КВИЗА
+// ═══════════════════════════════════════════════════════════
+function startQuiz(module) {
+  currentModule = module;
+  const prefix = module === 'dates' ? 'd' : 'p';
+  const cnt = selectedCount[prefix];
+  const typ = selectedType[prefix];
+
+  if (module === 'dates') {
+    const pool = shuffle(ALL_DATES).slice(0, cnt === 'all' ? ALL_DATES.length : cnt);
+    questions = pool.map(item => {
+      const mode = typ === 'mixed' ? (Math.random() < 0.5 ? 'date' : 'event') : typ;
+      return buildDateQuestion(item, mode);
+    });
+  } else {
+    const pool = shuffle(ALL_PERSONS).slice(0, cnt === 'all' ? ALL_PERSONS.length : cnt);
+    questions = pool.map(item => {
+      const mode = typ === 'mixed' ? (Math.random() < 0.5 ? 'name' : 'desc') : typ;
+      return buildPersonQuestion(item, mode);
+    });
   }
 
-  return {
-    questionText,
-    mode,
-    options: shuffle(options),
-    correctDate,
-    correctEvent,
-  };
-}
-
-// ── Меню ─────────────────────────────────────────────────────────────────────
-function selectCount(val) {
-  selectedCount = val;
-  document.querySelectorAll('[id^="cnt-"]').forEach(b => b.classList.remove('selected'));
-  document.getElementById('cnt-' + val).classList.add('selected');
-  updateStartBtn();
-}
-
-function selectType(val) {
-  selectedType = val;
-  document.querySelectorAll('[id^="type-"]').forEach(b => b.classList.remove('selected'));
-  document.getElementById('type-' + val).classList.add('selected');
-  updateStartBtn();
-}
-
-function updateStartBtn() {
-  document.getElementById('start-btn').disabled = !(selectedCount && selectedType);
-}
-
-// ── Квиз ─────────────────────────────────────────────────────────────────────
-function startQuiz() {
-  const count = selectedCount === 'all' ? ALL_DATES.length : selectedCount;
-  const pool = shuffle(ALL_DATES).slice(0, Math.min(count, ALL_DATES.length));
-
-  questions = pool.map(item => {
-    const mode = selectedType === 'mixed'
-      ? (Math.random() < 0.5 ? 'date' : 'event')
-      : selectedType;
-    return buildQuestion(item, mode);
-  });
-
-  currentIdx = 0;
-  score = 0;
-  sessionLog = [];
+  currentIdx = 0; score = 0; sessionLog = [];
   showScreen('quiz');
   renderQuestion();
 }
 
+// ═══════════════════════════════════════════════════════════
+// РЕНДЕР ВОПРОСА
+// ═══════════════════════════════════════════════════════════
 function renderQuestion() {
   const q = questions[currentIdx];
   const total = questions.length;
 
-  // Progress
   document.getElementById('progress-label').textContent = `Вопрос ${currentIdx + 1} из ${total}`;
   document.getElementById('progress-score').textContent = `✓ ${score}`;
   document.getElementById('progress-fill').style.width = `${(currentIdx / total) * 100}%`;
 
-  // Badge
   const badge = document.getElementById('question-badge');
-  if (q.mode === 'date') {
-    badge.textContent = '📖 Событие → дата';
+  if (q.type === 'date') {
+    badge.textContent = q.mode === 'date' ? '📖 Событие → дата' : '📅 Дата → событие';
   } else {
-    badge.textContent = '📅 Дата → событие';
+    badge.textContent = q.mode === 'name' ? '👤 Имя → описание' : '🔍 Описание → имя';
   }
 
-  // Question
   document.getElementById('question-text').textContent = q.questionText;
 
-  // Answers
   const list = document.getElementById('answers-list');
   list.innerHTML = '';
   const labels = ['A', 'B', 'C', 'D'];
@@ -774,74 +824,54 @@ function renderQuestion() {
     list.appendChild(btn);
   });
 
-  // Hide feedback & next
-  const fb = document.getElementById('feedback-bar');
-  fb.className = 'feedback-bar';
+  document.getElementById('feedback-bar').className = 'feedback-bar';
   document.getElementById('next-btn').className = 'next-btn';
 }
 
+// ═══════════════════════════════════════════════════════════
+// ОБРАБОТКА ОТВЕТА
+// ═══════════════════════════════════════════════════════════
 function handleAnswer(idx, chosenText, isCorrect) {
   const q = questions[currentIdx];
   const cards = document.querySelectorAll('.answer-card');
-
-  // Disable all
   cards.forEach(c => c.disabled = true);
 
-  // Mark chosen
   if (isCorrect) {
     cards[idx].classList.add('correct');
     score++;
   } else {
     cards[idx].classList.add('wrong');
-    // Show correct
-    q.options.forEach(([, ic], i) => {
-      if (ic) cards[i].classList.add('correct');
-    });
+    q.options.forEach(([,ic], i) => { if (ic) cards[i].classList.add('correct'); });
   }
 
-  // Feedback
   const fb = document.getElementById('feedback-bar');
   const fbTitle = document.getElementById('fb-title');
   const fbPair = document.getElementById('fb-pair');
 
-  if (isCorrect) {
-    fb.className = 'feedback-bar correct-fb show';
-    fbTitle.textContent = '✅ Верно!';
+  fb.className = isCorrect ? 'feedback-bar correct-fb show' : 'feedback-bar wrong-fb show';
+  fbTitle.textContent = isCorrect ? '✅ Верно!' : '❌ Неверно!';
+
+  if (q.type === 'date') {
+    const relatedEvents = ALL_DATES.filter(([d]) => d === q.correctDate);
+    let html = '';
+    relatedEvents.forEach(([d, e]) => { html += `<div>📅 <b>${d}</b> — ${e}</div>`; });
+    fbPair.innerHTML = html;
   } else {
-    fb.className = 'feedback-bar wrong-fb show';
-    fbTitle.textContent = '❌ Неверно!';
+    fbPair.innerHTML = `<div>👤 <b>${q.correctName}</b> — ${q.correctDesc}</div>`;
   }
 
-// показать все связанные события/даты из базы
-let allPairs = '';
-
-if (q.mode === 'date') {
-  const relatedEvents = ALL_DATES.filter(([d]) => d === q.correctDate);
-
-  relatedEvents.forEach(([d, e]) => {
-    allPairs += `<div>📅 <b>${d}</b> — ${e}</div>`;
-  });
-} else {
-  const relatedDates = ALL_DATES.filter(([, e]) => e === q.correctEvent);
-
-  relatedDates.forEach(([d, e]) => {
-    allPairs += `<div>📖 <b>${d}</b> — ${e}</div>`;
-  });
-}
-
-fbPair.innerHTML = allPairs;
-
-  // Log
   sessionLog.push({
     questionText: q.questionText,
     mode: q.mode,
+    type: q.type,
     correctDate: q.correctDate,
     correctEvent: q.correctEvent,
+    correctName: q.correctName,
+    correctDesc: q.correctDesc,
     chosenText,
     isCorrect,
   });
 
-  // Show next
   const nextBtn = document.getElementById('next-btn');
   nextBtn.className = 'next-btn show';
   nextBtn.textContent = currentIdx + 1 < questions.length ? 'Следующий →' : 'Посмотреть итог →';
@@ -849,21 +879,18 @@ fbPair.innerHTML = allPairs;
 
 function nextQuestion() {
   currentIdx++;
-  if (currentIdx < questions.length) {
-    renderQuestion();
-    window.scrollTo(0, 0);
-  } else {
-    showResults();
-  }
+  if (currentIdx < questions.length) { renderQuestion(); window.scrollTo(0, 0); }
+  else showResults();
 }
 
-// ── Результаты ────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// РЕЗУЛЬТАТЫ
+// ═══════════════════════════════════════════════════════════
 function showResults() {
   const total = questions.length;
   const wrong = total - score;
   const pct = Math.round(score / total * 100);
 
-  // Emoji & title
   let emoji, title;
   if (pct >= 90) { emoji = '🏆'; title = 'Отлично!'; }
   else if (pct >= 70) { emoji = '👍'; title = 'Хорошо!'; }
@@ -877,55 +904,43 @@ function showResults() {
   document.getElementById('stat-wrong').textContent = wrong;
   document.getElementById('stat-pct').textContent = pct + '%';
 
-  // Review list
   const reviewList = document.getElementById('review-list');
   reviewList.innerHTML = '';
 
-  sessionLog.forEach((log, i) => {
+  sessionLog.forEach(log => {
     const div = document.createElement('div');
     div.className = `review-item ${log.isCorrect ? 'review-correct' : 'review-wrong'}`;
-
     const badgeText = log.isCorrect ? '✓ Верно' : '✗ Неверно';
-    const modeText = log.mode === 'date' ? 'Событие → дата' : 'Дата → событие';
+    let modeText = '';
+    if (log.type === 'date') modeText = log.mode === 'date' ? 'Событие → дата' : 'Дата → событие';
+    else modeText = log.mode === 'name' ? 'Имя → описание' : 'Описание → имя';
 
     let answersHtml = '';
     if (log.isCorrect) {
       answersHtml = `<div class="review-answer ra-correct"><span class="ra-icon">✓</span><span>${log.chosenText}</span></div>`;
     } else {
-      const correctAnswer = log.mode === 'date' ? log.correctDate : log.correctEvent;
+      let correctAnswer = '';
+      if (log.type === 'date') correctAnswer = log.mode === 'date' ? log.correctDate : log.correctEvent;
+      else correctAnswer = log.mode === 'name' ? log.correctDesc : log.correctName;
       answersHtml = `
         <div class="review-answer ra-wrong"><span class="ra-icon">✗</span><span>Ваш ответ: ${log.chosenText}</span></div>
-        <div class="review-answer ra-correct"><span class="ra-icon">✓</span><span>Верно: ${correctAnswer}</span></div>
-      `;
+        <div class="review-answer ra-correct"><span class="ra-icon">✓</span><span>Верно: ${correctAnswer}</span></div>`;
     }
 
     div.innerHTML = `
       <div class="review-item-header">
         <span class="review-badge">${badgeText}</span>
-        <span style="font-size:12px;color:var(--hint)">${modeText}</span>
+        <span style="font-size:11px;color:var(--hint)">${modeText}</span>
       </div>
       <div class="review-question">${log.questionText}</div>
-      <div class="review-answers">${answersHtml}</div>
-    `;
+      <div class="review-answers">${answersHtml}</div>`;
     reviewList.appendChild(div);
   });
 
   showScreen('results');
-  window.scrollTo(0, 0);
 }
 
-function restartQuiz() {
-  startQuiz();
-}
-
-function showMenu() {
-  showScreen('menu');
-}
-
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
-}
+function restartQuiz() { startQuiz(currentModule); }
 </script>
 </body>
 </html>
