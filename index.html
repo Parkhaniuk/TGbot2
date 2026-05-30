@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>История</title>
+<title>Учёба</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root {
@@ -15,6 +15,8 @@
     --accent-text: var(--tg-theme-button-text-color, #ffffff);
     --green: #34c759;
     --red: #ff3b30;
+    --gold: #ffd60a;
+    --purple: #bf5af2;
     --radius: 16px;
     --radius-sm: 12px;
   }
@@ -95,6 +97,42 @@
   .start-btn:active { opacity: 0.8; }
   .start-btn:disabled { opacity: 0.4; cursor: default; }
 
+  /* ── English Level Cards ── */
+  .level-cards { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+  .level-card {
+    background: var(--bg2); border-radius: var(--radius);
+    padding: 16px 18px; cursor: pointer;
+    display: flex; align-items: center; gap: 14px;
+    border: 2px solid transparent; transition: all 0.15s;
+  }
+  .level-card:active { transform: scale(0.98); }
+  .level-badge {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; flex-shrink: 0;
+  }
+  .level-badge.b2 { background: color-mix(in srgb, #3478f6 20%, var(--bg2)); color: #3478f6; }
+  .level-badge.c1 { background: color-mix(in srgb, var(--purple) 20%, var(--bg2)); color: var(--purple); }
+  .level-card-body { flex: 1; }
+  .level-card-title { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+  .level-card-desc { font-size: 12px; color: var(--hint); line-height: 1.3; }
+  .level-card-arrow { font-size: 18px; color: var(--hint); }
+
+  /* ── Topic Cards ── */
+  .topic-cards { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+  .topic-card {
+    background: var(--bg2); border-radius: var(--radius-sm);
+    padding: 14px 16px; cursor: pointer;
+    display: flex; align-items: center; gap: 12px;
+    border: 2px solid transparent; transition: all 0.15s;
+  }
+  .topic-card:active { transform: scale(0.98); }
+  .topic-icon { font-size: 24px; flex-shrink: 0; }
+  .topic-body { flex: 1; }
+  .topic-title { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+  .topic-sub { font-size: 12px; color: var(--hint); }
+  .topic-count { font-size: 11px; font-weight: 600; color: var(--hint); background: var(--bg); padding: 3px 8px; border-radius: 8px; }
+
   /* ── Quiz ── */
   .progress-bar-wrap { padding: 16px 20px 0; }
   .progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -111,6 +149,7 @@
     padding: 4px 10px; font-size: 12px; font-weight: 600; margin-bottom: 10px;
   }
   .question-text { font-size: 15px; line-height: 1.5; font-weight: 500; }
+  .question-text em { font-style: italic; color: var(--hint); }
 
   .answers-list { padding: 10px 16px 0; display: flex; flex-direction: column; gap: 9px; }
   .answer-card {
@@ -141,9 +180,11 @@
   .feedback-bar.show { display: block; }
   .feedback-bar.correct-fb { background: color-mix(in srgb, var(--green) 12%, var(--bg2)); border-left: 3px solid var(--green); }
   .feedback-bar.wrong-fb { background: color-mix(in srgb, var(--red) 10%, var(--bg2)); border-left: 3px solid var(--red); }
-  .feedback-bar .fb-title { font-weight: 700; margin-bottom: 4px; }
-  .feedback-bar .fb-pair { color: var(--hint); font-size: 13px; margin-top: 6px; }
-  .feedback-bar .fb-pair span { color: var(--text); font-weight: 500; }
+  .feedback-bar .fb-title { font-weight: 700; margin-bottom: 6px; }
+  .feedback-bar .fb-explanation { color: var(--text); font-size: 13px; line-height: 1.6; }
+  .feedback-bar .fb-rule { color: var(--hint); font-size: 12px; margin-top: 8px; padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--hint) 20%, transparent); }
+  .feedback-bar .fb-rule b { color: var(--text); }
+  .feedback-bar .fb-example { font-style: italic; color: color-mix(in srgb, var(--accent) 90%, var(--text)); margin-top: 4px; font-size: 12px; }
 
   .next-btn {
     margin: 14px 16px 0; background: var(--accent); color: var(--accent-text);
@@ -180,7 +221,7 @@
   .review-answer { font-size: 13px; padding: 5px 9px; border-radius: 7px; display: flex; align-items: flex-start; gap: 6px; }
   .review-answer.ra-correct { background: color-mix(in srgb, var(--green) 15%, transparent); color: var(--green); }
   .review-answer.ra-wrong { background: color-mix(in srgb, var(--red) 15%, transparent); color: var(--red); }
-  .review-answer .ra-icon { flex-shrink: 0; }
+  .review-explanation { font-size: 12px; color: var(--hint); margin-top: 6px; padding-top: 6px; border-top: 1px solid color-mix(in srgb, var(--hint) 15%, transparent); line-height: 1.5; }
 
   .result-actions { padding: 18px 16px 0; display: flex; flex-direction: column; gap: 10px; }
   .btn-primary { background: var(--accent); color: var(--accent-text); border: none; border-radius: var(--radius); padding: 15px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: opacity 0.15s; }
@@ -191,9 +232,37 @@
 </head>
 <body>
 
-<!-- ══ HOME SCREEN ══ -->
+<!-- ══ HOME: ВЫБОР ПРЕДМЕТА ══ -->
 <div class="screen active" id="screen-home">
   <div class="home-hero">
+    <div class="emoji">🎓</div>
+    <h1>Учёба</h1>
+    <p>Выбери предмет для тренировки</p>
+  </div>
+  <div class="mode-cards">
+    <div class="mode-card" onclick="showScreen('history-home')">
+      <div class="mode-card-icon">📜</div>
+      <div class="mode-card-body">
+        <div class="mode-card-title">История</div>
+        <div class="mode-card-desc">Даты, личности, события</div>
+      </div>
+      <div class="mode-card-arrow">›</div>
+    </div>
+    <div class="mode-card" onclick="showScreen('english-home')">
+      <div class="mode-card-icon">🇬🇧</div>
+      <div class="mode-card-body">
+        <div class="mode-card-title">Английский</div>
+        <div class="mode-card-desc">Грамматика и лексика B2–C1</div>
+      </div>
+      <div class="mode-card-arrow">›</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HISTORY HOME ══ -->
+<div class="screen" id="screen-history-home">
+  <button class="back-btn" onclick="showScreen('home')">← Назад</button>
+  <div class="home-hero" style="padding-top:20px">
     <div class="emoji">📜</div>
     <h1>История</h1>
     <p>Проверь знание дат и личностей.<br>Выбери раздел для тренировки:</p>
@@ -220,13 +289,12 @@
 
 <!-- ══ DATES MENU ══ -->
 <div class="screen" id="screen-dates-menu">
-  <button class="back-btn" onclick="showScreen('home')">← Назад</button>
+  <button class="back-btn" onclick="showScreen('history-home')">← Назад</button>
   <div class="menu-hero">
     <div class="emoji">📅</div>
     <h1>Даты истории</h1>
     <p>Проверь знание ключевых дат</p>
   </div>
-
   <div class="section-label">Количество вопросов</div>
   <div class="options-group">
     <div class="option-row">
@@ -244,7 +312,6 @@
       <span class="opt-icon">📚</span><span>Все даты (~80)</span>
     </button>
   </div>
-
   <div class="section-label">Тип вопросов</div>
   <div class="options-group">
     <div class="option-row">
@@ -259,19 +326,17 @@
       <span class="opt-icon">🎲</span><span>Смешанный режим</span>
     </button>
   </div>
-
   <button class="start-btn" id="d-start-btn" onclick="startQuiz('dates')" disabled>Начать →</button>
 </div>
 
 <!-- ══ PERSONS MENU ══ -->
 <div class="screen" id="screen-persons-menu">
-  <button class="back-btn" onclick="showScreen('home')">← Назад</button>
+  <button class="back-btn" onclick="showScreen('history-home')">← Назад</button>
   <div class="menu-hero">
     <div class="emoji">👤</div>
     <h1>Личности</h1>
     <p>Проверь знание исторических деятелей</p>
   </div>
-
   <div class="section-label">Количество вопросов</div>
   <div class="options-group">
     <div class="option-row">
@@ -289,7 +354,6 @@
       <span class="opt-icon">📚</span><span>Все личности (~150)</span>
     </button>
   </div>
-
   <div class="section-label">Тип вопросов</div>
   <div class="options-group">
     <div class="option-row">
@@ -304,12 +368,144 @@
       <span class="opt-icon">🎲</span><span>Смешанный режим</span>
     </button>
   </div>
-
   <button class="start-btn" id="p-start-btn" onclick="startQuiz('persons')" disabled>Начать →</button>
 </div>
 
-<!-- ══ QUIZ SCREEN ══ -->
+<!-- ══ ENGLISH HOME: ВЫБОР УРОВНЯ ══ -->
+<div class="screen" id="screen-english-home">
+  <button class="back-btn" onclick="showScreen('home')">← Назад</button>
+  <div class="menu-hero">
+    <div class="emoji">🇬🇧</div>
+    <h1>Английский</h1>
+    <p>Выбери уровень для тренировки</p>
+  </div>
+  <div class="level-cards" style="margin-top:8px">
+    <div class="level-card" onclick="showEnglishTopics('b2')">
+      <div class="level-badge b2">B2</div>
+      <div class="level-card-body">
+        <div class="level-card-title">Upper-Intermediate</div>
+        <div class="level-card-desc">Условные предложения, модальные глаголы, фразовые глаголы</div>
+      </div>
+      <div class="level-card-arrow">›</div>
+    </div>
+    <div class="level-card" onclick="showEnglishTopics('c1')">
+      <div class="level-badge c1">C1</div>
+      <div class="level-card-body">
+        <div class="level-card-title">Advanced</div>
+        <div class="level-card-desc">Инверсия, сослагательное наклонение, идиомы, смешанные условия</div>
+      </div>
+      <div class="level-card-arrow">›</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ENGLISH TOPICS: B2 ══ -->
+<div class="screen" id="screen-english-topics-b2">
+  <button class="back-btn" onclick="showScreen('english-home')">← Назад</button>
+  <div class="menu-hero">
+    <div class="emoji">📘</div>
+    <h1>B2 — Upper-Intermediate</h1>
+    <p>Выбери тему</p>
+  </div>
+  <div class="topic-cards" style="margin-top:8px">
+    <div class="topic-card" onclick="startEnglishQuiz('b2','conditionals')">
+      <div class="topic-icon">🔀</div>
+      <div class="topic-body">
+        <div class="topic-title">Условные предложения</div>
+        <div class="topic-sub">1st, 2nd, 3rd Conditional</div>
+      </div>
+      <div class="topic-count">15 вопр.</div>
+    </div>
+    <div class="topic-card" onclick="startEnglishQuiz('b2','modals')">
+      <div class="topic-icon">💭</div>
+      <div class="topic-body">
+        <div class="topic-title">Модальные глаголы</div>
+        <div class="topic-sub">must, can't, should, may, might</div>
+      </div>
+      <div class="topic-count">15 вопр.</div>
+    </div>
+    <div class="topic-card" onclick="startEnglishQuiz('b2','phrasal')">
+      <div class="topic-icon">⚙️</div>
+      <div class="topic-body">
+        <div class="topic-title">Фразовые глаголы</div>
+        <div class="topic-sub">come up with, put off, get over…</div>
+      </div>
+      <div class="topic-count">15 вопр.</div>
+    </div>
+    <div class="topic-card" onclick="startEnglishQuiz('b2','passive')">
+      <div class="topic-icon">🔄</div>
+      <div class="topic-body">
+        <div class="topic-title">Пассивный залог</div>
+        <div class="topic-sub">Passive Voice — все времена</div>
+      </div>
+      <div class="topic-count">12 вопр.</div>
+    </div>
+    <div class="topic-card" onclick="startEnglishQuiz('b2','reported')">
+      <div class="topic-icon">💬</div>
+      <div class="topic-body">
+        <div class="topic-title">Косвенная речь</div>
+        <div class="topic-sub">Reported speech, backshift</div>
+      </div>
+      <div class="topic-count">12 вопр.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ENGLISH TOPICS: C1 ══ -->
+<div class="screen" id="screen-english-topics-c1">
+  <button class="back-btn" onclick="showScreen('english-home')">← Назад</button>
+  <div class="menu-hero">
+    <div class="emoji">📗</div>
+    <h1>C1 — Advanced</h1>
+    <p>Выбери тему</p>
+  </div>
+  <div class="topic-cards" style="margin-top:8px">
+    <div class="topic-card" onclick="startEnglishQuiz('c1','inversion')">
+      <div class="topic-icon">🔃</div>
+      <div class="topic-body">
+        <div class="topic-title">Инверсия</div>
+        <div class="topic-sub">Never, Hardly, Not only, Should you…</div>
+      </div>
+      <div class="topic-count">15 вопр.</div>
+    </div>
+    <div class="topic-card" onclick="startEnglishQuiz('c1','subjunctive')">
+      <div class="topic-icon">🌀</div>
+      <div class="topic-body">
+        <div class="topic-title">Сослагательное наклонение</div>
+        <div class="topic-sub">wish, if only, as if, it's time…</div>
+      </div>
+      <div class="topic-count">15 вопр.</div>
+    </div>
+    <div class="topic-card" onclick="startEnglishQuiz('c1','mixed_cond')">
+      <div class="topic-icon">🎭</div>
+      <div class="topic-body">
+        <div class="topic-title">Смешанные условия</div>
+        <div class="topic-sub">Mixed conditionals + формальные конструкции</div>
+      </div>
+      <div class="topic-count">12 вопр.</div>
+    </div>
+    <div class="topic-card" onclick="startEnglishQuiz('c1','idioms')">
+      <div class="topic-icon">🗣️</div>
+      <div class="topic-body">
+        <div class="topic-title">Идиомы</div>
+        <div class="topic-sub">Устойчивые выражения C1</div>
+      </div>
+      <div class="topic-count">15 вопр.</div>
+    </div>
+    <div class="topic-card" onclick="startEnglishQuiz('c1','collocations')">
+      <div class="topic-icon">🔗</div>
+      <div class="topic-body">
+        <div class="topic-title">Коллокации и словосочетания</div>
+        <div class="topic-sub">make/do, collocations C1</div>
+      </div>
+      <div class="topic-count">15 вопр.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ QUIZ SCREEN (общий для истории и английского) ══ -->
 <div class="screen" id="screen-quiz">
+  <button class="back-btn" id="quiz-back-btn" onclick="goBackFromQuiz()" style="margin-bottom:4px">← Выйти</button>
   <div class="progress-bar-wrap">
     <div class="progress-info">
       <span class="progress-label" id="progress-label">Вопрос 1 из 10</span>
@@ -318,18 +514,19 @@
     <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   </div>
   <div class="question-card">
-    <div class="question-type-badge" id="question-badge">📅 Дата</div>
+    <div class="question-type-badge" id="question-badge">📅 Тема</div>
     <div class="question-text" id="question-text"></div>
   </div>
   <div class="answers-list" id="answers-list"></div>
   <div class="feedback-bar" id="feedback-bar">
     <div class="fb-title" id="fb-title"></div>
-    <div class="fb-pair" id="fb-pair"></div>
+    <div class="fb-explanation" id="fb-explanation"></div>
+    <div class="fb-rule" id="fb-rule"></div>
   </div>
   <button class="next-btn" id="next-btn" onclick="nextQuestion()">Следующий →</button>
 </div>
 
-<!-- ══ RESULTS SCREEN ══ -->
+<!-- ══ RESULTS ══ -->
 <div class="screen" id="screen-results">
   <div class="result-hero">
     <div class="result-emoji" id="result-emoji">🏆</div>
@@ -347,7 +544,7 @@
   </div>
   <div class="result-actions">
     <button class="btn-primary" onclick="restartQuiz()">🔄 Повторить</button>
-    <button class="btn-secondary" onclick="showScreen('home')">🏠 В меню</button>
+    <button class="btn-secondary" id="result-home-btn" onclick="goResultHome()">🏠 В меню</button>
   </div>
 </div>
 
@@ -440,10 +637,9 @@ const ALL_DATES = [
 ];
 
 // ═══════════════════════════════════════════════════════════
-// БАЗА: ЛИЧНОСТИ [имя, описание]
+// БАЗА: ЛИЧНОСТИ
 // ═══════════════════════════════════════════════════════════
 const ALL_PERSONS = [
-  // Древность
   ["Геродот", "Древнегреческий историк, «отец истории»"],
   ["Полибий", "Древнегреческий историк, автор первой «Всеобщей истории»"],
   ["Ч. Дарвин", "Английский учёный, сформулировавший теорию эволюции в книге «Происхождение видов»"],
@@ -451,7 +647,6 @@ const ALL_PERSONS = [
   ["Гомер", "Автор древнегреческих поэм «Илиада» и «Одиссея»"],
   ["Гиппократ", "Древнегреческий врач"],
   ["Ромул Август", "Последний римский император"],
-  // Раннее Средневековье
   ["Хлодвиг", "Король франков в 5 веке, подчинивший почти всю Галлию"],
   ["Карл Великий", "Император франкского государства, восстановивший его единство"],
   ["Оттон I", "Первый правитель Священной Римской империи"],
@@ -461,163 +656,1370 @@ const ALL_PERSONS = [
   ["Иннокентий III", "Папа Римский, при котором Римская церковь достигла наибольшего могущества"],
   ["Феодосий II", "Византийский император, основавший университет в Константинополе"],
   ["Кирилл, Мефодий", "Создатели славянского алфавита"],
-  ["Лев Математик", "Учёный, один из основоположников алгебры"],
-  ["Е. Кесарийский", "Автор исторической хроники «Хроника»"],
-  ["П. Кесарийский", "Автор «Истории войн Юстиниана»"],
   ["О. Хайям", "Персидский философ, математик, астроном и поэт"],
-  // Позднее Средневековье — деятели
-  ["Марко Поло", "Венецианец, совершивший многолетнее путешествие в Китай и Центральную Азию, автор «Книги о разнообразии мира»"],
-  ["Роджер Бэкон", "Английский учёный, написал работы о природе света и цвета, разработал новые теории об увеличительных стёклах"],
+  ["Марко Поло", "Венецианец, совершивший многолетнее путешествие в Китай и Центральную Азию"],
   ["Ибн Сина (Авиценна)", "Написал книгу «Канон врачебной науки»"],
-  ["Плиний Старший", "Назвал славян «венедами»"],
   ["Ян Гус", "Чешский проповедник, мыслитель, религиозный реформатор"],
-  ["Исидор", "Митрополит Русской церкви, подписал акт об объединении церквей, последний митрополит в Москве, поставленным константинопольским патриархом"],
-  ["Иона", "Первый Митрополит Русской церкви русского происхождения"],
-  ["Иоганн Гутенберг", "Немецкий изобретатель, создал книгопечатный станок в 1445, напечатал первую книгу в 1455"],
-  // Деятели Возрождения
-  ["Эразм Роттердамский", "Голландский мыслитель, учёный и богослов эпохи Возрождения, автор «Похвалы глупости»"],
-  ["Франсуа Рабле", "Французский писатель, автор «Гаргантюа и Пантагрюэль»"],
-  ["Мигель де Сервантес", "Испанский писатель, автор «Дон Кихот»"],
+  ["Иоганн Гутенберг", "Немецкий изобретатель, создал книгопечатный станок в 1445"],
+  ["Эразм Роттердамский", "Голландский мыслитель эпохи Возрождения, автор «Похвалы глупости»"],
   ["Томас Мор", "Английский утопист, автор «Утопия»"],
-  ["Томмазо Кампанелла", "Итальянский утопист, автор «Город солнца»"],
-  ["Жан Боден", "Француз, представитель теории абсолютизма"],
   ["Никколо Макиавелли", "Итальянский мыслитель, автор «Государь»"],
   ["Уильям Шекспир", "Английский драматург"],
-  ["Рафаэль Санти", "Итальянский живописец"],
-  ["Микеланджело", "Итальянский живописец"],
-  ["Тициан Вечеллио", "Итальянский живописец"],
-  ["Питер Брейгель", "Нидерландский живописец"],
-  ["Альбрехт Дюрер", "Германский живописец"],
-  ["Ганс Гольбейн", "Германский живописец"],
-  ["Николай Коперник", "Создал учение об обращении Земли вокруг Солнца и вращении вокруг своей оси"],
-  ["Джордано Бруно", "Создал учение о безмерности, бесконечности и вечности Вселенной"],
+  ["Николай Коперник", "Создал учение об обращении Земли вокруг Солнца"],
   ["Галилео Галилей", "Подтвердил гелиоцентрическую теорию Коперника"],
   ["Леонардо да Винчи", "Итальянский художник, изобретатель, писатель"],
-  ["К. Острожский", "Основал Острожскую славяно-греко-латинскую академию"],
-  // Реформация
   ["Мартин Лютер", "Немецкий христианский богослов, инициатор Реформации"],
-  ["Жан Кальвин", "«Женевский папа», сформулировал учение о предопределении и божественном суверенитете"],
-  ["Ульрих Цвингли", "Возглавил Реформацию в Швейцарии"],
+  ["Жан Кальвин", "Сформулировал учение о предопределении и божественном суверенитете"],
   ["Генрих VIII", "Король, инициатор Реформации в Англии"],
-  ["Мария Тюдор", "Английская королева, католичка, приход к власти ознаменован кровавыми столкновениями между протестантами и католиками"],
   ["Елизавета I", "Английская королева, при которой окончательно сформировалась государственная англиканская церковь"],
-  ["Генрих IV", "Французский король, издание Нантского эдикта"],
-  ["Игнатий Лойола", "Создатель католического ордена иезуитов"],
-  // Просвещение
-  ["Вольтер", "Французский просветитель, выступал против тирании и неравенства, отстаивал свободу совести и слова"],
+  ["Вольтер", "Французский просветитель, выступал против тирании и неравенства"],
   ["Ж.Ж. Руссо", "Французский просветитель, написал «Общественный договор»"],
   ["Дени Дидро", "Французский просветитель, издал многотомную «Энциклопедию»"],
   ["Иммануил Кант", "Немецкий философ, «Критика чистого разума»"],
-  ["Иоганн Гердер", "Немецкий просветитель, внёс вклад в развитие литературоведения, эстетики и теории языка"],
-  ["Готхольд Лессинг", "Немецкий просветитель, критика классицизма с позиции требований нового времени"],
-  ["Иоганн Гёте", "Немецкий писатель и поэт"],
-  ["Фридрих Шиллер", "Немецкий писатель и поэт"],
-  ["Иоганн Бах", "Немецкий композитор"],
-  ["Людвиг ван Бетховен", "Немецкий композитор"],
-  ["Джонатан Свифт", "«Гулливер в стране лилипутов»"],
-  ["Джон Локк", "«Опыт о человеческом разумении»"],
   ["Исаак Ньютон", "Английский физик, математик и астроном"],
-  ["М. Ломоносов", "Русский учёный, выходец из поморских крестьян"],
-  ["А. Радищев", "«Путешествие из Петербурга в Москву», настаивал на вреде крепостного права и самодержавия"],
-  // Деятели ВКЛ
-  ["Альбрехт Гаштольд", "Канцлер ВКЛ, соавтор Статута 1529 года"],
-  ["Николай Радзивилл Чёрный", "Канцлер ВКЛ, участник подготовки Статута 1566 года, основатель первой в ВКЛ кальвинистской общины, меценат кальвинизма"],
-  ["Николай Радзивилл Рыжий", "Глава делегации ВКЛ на Люблинском сейме, победа на реке Улле"],
-  ["Остафий Волович", "Канцлер ВКЛ, один из руководителей комиссии третьей редакции Статута ВКЛ"],
-  ["Лев Сапега", "Подканцлер ВКЛ, один из руководителей комиссии третьей редакции Статута ВКЛ"],
-  ["Франциск Скорина", "Первопечатник, автор произведений: «Псалтырь», «Библия руска», «Малая подорожная книжица», «Апостол»"],
-  ["Н. Гусовский", "«Песнь о зубре»"],
-  ["С. Будный", "Издатель книги «Катехизис»"],
-  ["В. Тяпинский", "Перевёл на старобелорусский «Евангелие»"],
-  ["С. Соболь", "Опубликовал «Букварь»"],
-  ["Братья Мамоничи", "Издали Статут ВКЛ 1588"],
-  ["С. Полоцкий", "Автор «Обед душевный» и «Вечеря душевная»"],
-  ["К. Семенович", "Автор труда «Великое искусство артиллерии»"],
-  ["А. Коялович", "Автор произведения «История Литвы»"],
-  ["Г. Конисский", "Защитник православия, Могилевский архиепископ"],
-  ["М. Почобут-Одляницкий", "Математик, физик, ректор Главной школы ВКЛ"],
-  ["М. Смотрицкий", "Автор одной из славянских грамматик"],
+  ["Франциск Скорина", "Первопечатник, автор «Псалтырь», «Библия руска»"],
   ["Тадеуш Костюшко", "Инициатор восстания 1794 года"],
-  ["Якуб Ясинский", "Руководитель восстания 1794 года в ВКЛ"],
-  ["М. Ф. Чарторыйский", "Инициатор реформ в РП в 1760-е годы"],
-  ["Бона Сфорца", "Инициаторка волочной померы"],
-  ["Казимир Радзивилл (Рыбонька)", "Владелец Несвижа, отстроивший его после войны"],
-  ["Михаил Казимир Огинский", "Спонсор строительства водных каналов вт.п. 18 века"],
-  ["Матей Бутримович", "Инициатор строительства водных каналов"],
-  ["Антоний Тизенгауз", "Инициатор аграрной реформы королевских экономий"],
-  ["Петр Скарга", "Иезуит, книга «О единстве Церкви Божией»"],
-  ["Иосафат Кунцевич", "Витебский униатский священник, убитый в ходе антиуниатского восстания в Витебске 1623 года"],
-  // 19 век — мировые деятели
+  ["Кастусь Калиновский", "Руководитель восстания 1863–64 годов, автор «Мужыцкай праўды»"],
   ["Дж. Уатт", "Создание паровой машины"],
-  ["Ф. де Рива", "Создание двигателя внутреннего сгорания"],
-  ["М. Фарадей", "Создание электродвигателя"],
   ["К. Маркс", "Представитель социализма в Германии"],
-  ["Ф. Энгельс", "Представитель социализма в Германии"],
-  ["Дж. Гарибальди", "Деятель итальянского национального движения"],
   ["Отто фон Бисмарк", "Инициатор объединения земель Германии, канцлер Германской империи"],
   ["Симон Боливар", "Революционер, борец за независимость в Латинской Америке"],
-  // 19 век — деятели на территории Беларуси
-  ["М. Сперанский", "Российский чиновник, автор плана гос. преобразований «Введение к Уложению государственных законов»"],
-  ["П. Столыпин", "Председатель Совета министров РИ, инициатор столыпинской аграрной реформы"],
-  ["М. К. Огинский", "Разработал план создания автономии ВКЛ"],
-  ["Доминик Радзивилл", "Сторонник Наполеона в войне 1812"],
-  ["Иоахим Лелевель", "Руководитель восстания 1830-31 годов, демократическое направление"],
-  ["Кастусь Калиновский", "Руководитель восстания 1863-64 годов, глава Литовского провинциального комитета в Вильно, автор «Мужыцкай праўды»"],
-  ["Антон Луцкевич", "Создатель БСГ"],
-  ["Иван Луцкевич", "Создатель БСГ"],
-  // 19 век — белорусская культура
-  ["И. Носович", "«Словарь белорусского наречия»"],
-  ["В. Ластовский", "«Краткая история Беларуси»"],
-  ["Я. Барщевский", "«Шляхтич Завальня, или Беларусь в фантастических рассказах»"],
-  ["И. Домейко", "Знаменитый геолог, национальный герой Чили, уроженец Беларуси"],
-  ["С. Монюшко", "Композитор, музыка «Селянка», на которую была поставлена первая белорусская опера «Идиллия»"],
-  ["И. Буйницкий", "Первая белорусская профессиональная театральная труппа"],
-  ["Ф. Богушевич", "Писатель, «Дудка белорусская», «Смык белорусский», «Белорусы»"],
-  ["Я. Купала", "«А хто там ідзе», «Спадчына», «Павлинка», «Разоренное гнездо»"],
-  ["М. Богданович", "Автор сборника «Венок»"],
-  // 20 век
-  ["Б. Муссолини", "Основатель идеологии фашизма, итальянский диктатор 1922-1943 годов"],
-  ["Ф. Франко", "Инициатор гражданской войны в Испании, установил авторитарный режим в 1939 году"],
-  ["М. Ганди", "Лидер Национального конгресса в Индии, борец за независимость Индии"],
-  ["М. Кемаль Ататюрк", "Борец за независимость Турции, правитель, реформатор"],
-  ["Сунь Ятсен", "Создатель партии Гоминьдан в 1912 году"],
-  ["Л. Троцкий", "Революционер, автор идеи мировой социалистической революции"],
+  ["Б. Муссолини", "Основатель идеологии фашизма, итальянский диктатор 1922–1943 годов"],
+  ["М. Ганди", "Лидер Национального конгресса в Индии, борец за независимость"],
   ["В. Ленин", "Революционер, руководитель Октябрьской революции"],
-  ["И. Сталин", "Правитель СССР (1924-1953), автор идеи автономии Советского Союза"],
-  // 20 век — Беларусь
-  ["А. Червяков", "Государственный деятель БССР, подписал Декларацию о создании СССР от БССР"],
-  ["В. Игнатовский", "Первый президент Белорусской академии наук"],
-  ["Ю. Гагарин", "Первый космонавт в космосе"],
-  ["К. Рокоссовский", "Руководитель 1-ого Белорусского фронта в 1944"],
-  ["П. Климук", "Белорусский лётчик-космонавт"],
-  ["В. Мулявин", "Создатель «Песняров»"],
-  // 21 век
-  ["С. Шушкевич", "Председатель Верховного Совета Республики Беларусь, подписавший «Соглашение о создании Содружества Независимых Государств»"],
-  ["М. Василевская", "Первая космонавтка Республики Беларусь (2024)"],
-  ["Д. Домрачева", "Трёхкратная олимпийская чемпионка, Герой Беларуси"],
-  // Древняя Русь — князья
+  ["И. Сталин", "Правитель СССР (1924–1953)"],
+  ["Я. Купала", "«А хто там ідзе», «Спадчына», «Павлинка»"],
+  ["М. Богданович", "Автор сборника «Венок»"],
   ["Олег", "882–912 — Первый князь Древнерусского государства"],
-  ["Игорь", "912–945 — Князь, совершивший поход на Византию"],
-  ["Ольга", "945–964 — Княгиня, осуществила ряд реформ по упорядочению взимания дани с населения, ввела погосты"],
-  ["Святослав Игоревич", "964–972 — Князь, подчинил племя вятичей, нанёс поражение Хазарскому каганату, разгромил Болгарское царство, вёл войну с Византией на Балканах"],
-  ["Владимир Святославич", "980–1015 — Князь, крестил Русь, провёл административную, правовую, религиозную, оборонительную реформы"],
-  ["Ярослав Мудрый", "1019–1054 — Князь, принял свод законов «Русская правда»"],
-  ["Владимир Мономах", "1113–1125 — Князь, инициатор военных походов на степные народы Средней Азии"],
-  ["Мстислав Великий", "1125–1132 — Князь, после смерти которого началась раздробленность Древней Руси"],
-  // Полоцкое княжество
-  ["Рогволод", "960-е – 980 — Первый известный князь Полоцка"],
-  ["Всеслав Чародей", "1044–1101 — при нём княжество достигло наивысшего могущества, построил Софийский собор в Полоцке"],
-  ["Ефросинья Полоцкая", "Инициировала постройку монастырей и церквей в Полоцке, содействовала образованию, совершила паломничество в Иерусалим"],
-  ["Кирилл Туровский", "Первый из монахов совершил подвиг столпничества, был епископом, написал известные Слова К. Туровского"],
-  ["Лазарь Богша", "Изготовил Крест Ефросинии Полоцкой в 1161 году"],
-  ["Александр Невский", "Разгромил шведов в устье Невы, крестоносцев на Чудском озере"],
-  ["Игорь Святославич", "Черниговский князь, которому посвящено «Слово о полку Игореве»"],
+  ["Владимир", "980–1015 — Крестил Русь в 988 году"],
+  ["Ярослав Мудрый", "1019–1054 — Создал «Русскую правду»"],
+  ["Александр Невский", "Победил шведов в 1240 году на Неве, разбил Тевтонский орден в 1242 году"],
+  ["Ю. Гагарин", "Первый космонавт в космосе"],
+  ["С. Шушкевич", "Председатель Верховного Совета Республики Беларусь, подписавший «Соглашение о создании СНГ»"],
+  ["М. Василевская", "Первая космонавтка Республики Беларусь (2024)"],
 ];
+
+// ═══════════════════════════════════════════════════════════
+// БАЗА: ENGLISH QUESTIONS
+// ═══════════════════════════════════════════════════════════
+const ENGLISH_QUESTIONS = {
+
+  // ─── B2: CONDITIONALS ───
+  b2_conditionals: [
+    {
+      q: "If she _____ harder, she would pass the exam.",
+      badge: "🔀 2nd Conditional",
+      options: ["studies", "studied", "will study", "would study"],
+      correct: 1,
+      explanation: "Второе условное (2nd Conditional) описывает нереальную или маловероятную ситуацию в настоящем/будущем. В if-части всегда Past Simple.",
+      rule: "<b>Формула:</b> If + Past Simple → would + infinitive",
+      example: "If I had more money, I would travel the world."
+    },
+    {
+      q: "If you _____ me, I won't be angry.",
+      badge: "🔀 1st Conditional",
+      options: ["told", "will tell", "tell", "would tell"],
+      correct: 2,
+      explanation: "Первое условное (1st Conditional) — реальная ситуация в будущем. В if-части используется Present Simple (не Future!).",
+      rule: "<b>Формула:</b> If + Present Simple → will + infinitive",
+      example: "If it rains tomorrow, we will cancel the trip."
+    },
+    {
+      q: "If I had known about the party, I _____ there.",
+      badge: "🔀 3rd Conditional",
+      options: ["would have gone", "would go", "had gone", "went"],
+      correct: 0,
+      explanation: "Третье условное (3rd Conditional) — нереальное условие в прошлом. Действие уже невозможно изменить.",
+      rule: "<b>Формула:</b> If + Past Perfect → would have + Past Participle",
+      example: "If she had studied, she would have passed."
+    },
+    {
+      q: "Unless you _____ immediately, we'll miss the bus.",
+      badge: "🔀 Unless = If not",
+      options: ["leave", "left", "will leave", "would leave"],
+      correct: 0,
+      explanation: "Unless = 'если не'. После unless в условии 1st Conditional используется Present Simple — так же, как после if.",
+      rule: "<b>Unless + Present Simple</b> = If … not + Present Simple",
+      example: "Unless you hurry, you'll be late. = If you don't hurry…"
+    },
+    {
+      q: "Were I in your position, I _____ quit.",
+      badge: "🔀 Formal 2nd Cond.",
+      options: ["will", "would", "had", "should"],
+      correct: 1,
+      explanation: "Это формальная инверсия второго условного. Were I = If I were — типичная конструкция письменного английского C1.",
+      rule: "<b>Were + подлежащее</b> = If + подлежащее + were (формальный стиль)",
+      example: "Were she here, she would agree with you."
+    },
+    {
+      q: "I wish I _____ to the concert last night.",
+      badge: "🔀 Wish + Past",
+      options: ["went", "had gone", "would go", "go"],
+      correct: 1,
+      explanation: "Wish + Past Perfect выражает сожаление о прошлом. Действие уже произошло (или не произошло) — изменить нельзя.",
+      rule: "<b>Wish + Past Perfect</b> = сожаление о прошлом",
+      example: "I wish I had studied harder at school."
+    },
+    {
+      q: "Provided that you _____ the form, you can proceed.",
+      badge: "🔀 Provided that",
+      options: ["complete", "completed", "will complete", "would complete"],
+      correct: 0,
+      explanation: "Provided that / as long as / on condition that — формальные синонимы 'if'. После них — Present Simple в значении будущего.",
+      rule: "<b>Provided (that) + Present Simple</b> → will/can + infinitive",
+      example: "Provided that you pay on time, we'll deliver the goods."
+    },
+    {
+      q: "If only she _____ listen to me!",
+      badge: "🔀 If only",
+      options: ["would", "will", "has", "had"],
+      correct: 0,
+      explanation: "If only + would — выражает раздражение от того, что кто-то не делает того, чего мы хотим. Относится к настоящему.",
+      rule: "<b>If only + would + infinitive</b> = раздражение / желание изменить чьё-то поведение",
+      example: "If only they would stop making so much noise!"
+    },
+    {
+      q: "Had I known the answer, I _____ told you.",
+      badge: "🔀 Inversion 3rd Cond.",
+      options: ["would have", "would", "will have", "had"],
+      correct: 0,
+      explanation: "Had I known = If I had known — инверсия третьего условного. Формальная и типичная конструкция для C1/C2.",
+      rule: "<b>Had + подлежащее + Past Participle</b> = If + had + Past Participle",
+      example: "Had she arrived earlier, she would have met him."
+    },
+    {
+      q: "What _____ you do if you found a wallet on the street?",
+      badge: "🔀 2nd Conditional",
+      options: ["do", "did", "would", "will"],
+      correct: 2,
+      explanation: "В главной части второго условного всегда используется would. Это классический вопрос о нереальной ситуации.",
+      rule: "<b>What would you do if…</b> — типичная структура 2nd Conditional",
+      example: "What would you say if your boss offered you a promotion?"
+    },
+    {
+      q: "She would have got the job if she _____ better prepared.",
+      badge: "🔀 3rd Conditional",
+      options: ["were", "was", "had been", "has been"],
+      correct: 2,
+      explanation: "В if-части третьего условного всегда Past Perfect (had + V3). Здесь нужна форма had been.",
+      rule: "<b>If + had been</b> → would have + Past Participle",
+      example: "If he had been more careful, he wouldn't have made that mistake."
+    },
+    {
+      q: "If the weather _____ better, we could go for a picnic.",
+      badge: "🔀 2nd Conditional",
+      options: ["is", "was / were", "will be", "would be"],
+      correct: 1,
+      explanation: "Во втором условном в if-части используется Past Simple. Для глагола 'be' в формальном стиле предпочтительнее were, но was тоже допустимо.",
+      rule: "<b>If + was/were</b> (2nd Cond.) — в формальном стиле: were для всех лиц",
+      example: "If I were you, I would apologise."
+    },
+    {
+      q: "Supposing you _____ a million dollars — what would you do?",
+      badge: "🔀 Supposing = If",
+      options: ["win", "won", "would win", "will win"],
+      correct: 1,
+      explanation: "Supposing / suppose — синонимы 'if' в разговорном английском. Они вводят 2nd Conditional, поэтому после них Past Simple.",
+      rule: "<b>Supposing + Past Simple</b> = Imagine that… / If…",
+      example: "Supposing you lost your job, what would you do?"
+    },
+    {
+      q: "I would rather you _____ here tomorrow.",
+      badge: "🔀 Would rather",
+      options: ["come", "came", "will come", "would come"],
+      correct: 1,
+      explanation: "Would rather + that-clause (подразумевается) требует Past Simple, когда речь о другом человеке. Это нереальное желание о будущем.",
+      rule: "<b>Would rather + someone + Past Simple</b> (о другом человеке)",
+      example: "I'd rather she didn't know about this."
+    },
+    {
+      q: "It's high time you _____ a decision.",
+      badge: "🔀 It's high time",
+      options: ["make", "made", "will make", "would make"],
+      correct: 1,
+      explanation: "It's (high) time + Past Simple — устойчивая конструкция, выражающая, что что-то давно пора сделать. Прошедшее время здесь — не реальное прошлое, а условное.",
+      rule: "<b>It's (high) time + Past Simple</b> = пора бы уже…",
+      example: "It's time you went to bed."
+    },
+  ],
+
+  // ─── B2: MODALS ───
+  b2_modals: [
+    {
+      q: "You _____ have left your keys at the office — they're not here.",
+      badge: "💭 Модальные: дедукция",
+      options: ["can", "must", "should", "would"],
+      correct: 1,
+      explanation: "Must have + Past Participle — логический вывод о прошлом на основе имеющихся фактов (почти уверенность).",
+      rule: "<b>must have + V3</b> = единственно возможное объяснение прошлого события",
+      example: "She must have forgotten — she never misses meetings."
+    },
+    {
+      q: "He _____ have eaten the cake — he's been on a diet for weeks.",
+      badge: "💭 Can't have",
+      options: ["can't", "mustn't", "shouldn't", "needn't"],
+      correct: 0,
+      explanation: "Can't have + Past Participle — отрицание дедукции. Мы уверены, что этого НЕ было.",
+      rule: "<b>can't have + V3</b> = невозможно, чтобы это произошло",
+      example: "She can't have said that — she's always so polite."
+    },
+    {
+      q: "You _____ bring food to the cinema — it's prohibited.",
+      badge: "💭 Prohibition",
+      options: ["mustn't", "needn't", "don't have to", "shouldn't"],
+      correct: 0,
+      explanation: "Mustn't — строгий запрет (это нельзя делать). Don't have to — отсутствие обязательства (не нужно, но можно).",
+      rule: "<b>mustn't</b> = запрещено | <b>don't have to</b> = необязательно",
+      example: "You mustn't use your phone during the exam."
+    },
+    {
+      q: "You _____ have worried — everything turned out fine.",
+      badge: "💭 Needn't have",
+      options: ["needn't", "mustn't", "can't", "shouldn't"],
+      correct: 0,
+      explanation: "Needn't have + Past Participle — человек сделал что-то, но в этом не было необходимости (оглядываясь назад).",
+      rule: "<b>needn't have + V3</b> = сделал, но было ненужным",
+      example: "You needn't have cooked so much — we weren't that hungry."
+    },
+    {
+      q: "She _____ be the new manager — I'm not sure.",
+      badge: "💭 Possibility",
+      options: ["might", "must", "will", "should"],
+      correct: 0,
+      explanation: "Might — слабая вероятность в настоящем/будущем. May — чуть сильнее. Must — почти уверенность.",
+      rule: "<b>might/may</b> = возможно | <b>must</b> = почти наверняка",
+      example: "It might rain later — take an umbrella just in case."
+    },
+    {
+      q: "You _____ take a coat — it's not cold at all.",
+      badge: "💭 Don't have to",
+      options: ["mustn't", "don't have to", "can't", "shouldn't"],
+      correct: 1,
+      explanation: "Don't have to — нет обязательства, но это разрешено. Mustn't — запрет. Разница ключевая для B2+.",
+      rule: "<b>don't have to</b> = не обязательно (но можно) | <b>mustn't</b> = нельзя",
+      example: "You don't have to attend — it's optional."
+    },
+    {
+      q: "They _____ arrive any minute — the train was on time.",
+      badge: "💭 Should — expectation",
+      options: ["should", "must", "might", "can"],
+      correct: 0,
+      explanation: "Should в данном контексте — не обязательство, а ожидание/предположение (логическое следствие).",
+      rule: "<b>should + infinitive</b> = ожидается / должно произойти по логике",
+      example: "The package should arrive by Friday if it was sent on Monday."
+    },
+    {
+      q: "I _____ speak French when I was a child, but I've forgotten most of it.",
+      badge: "💭 Could — past ability",
+      options: ["could", "was able to", "can", "would"],
+      correct: 0,
+      explanation: "Could — способность в прошлом (общая). Was/were able to — применяется для конкретного случая в прошлом.",
+      rule: "<b>could</b> = общая способность в прошлом | <b>was able to</b> = конкретный достигнутый результат",
+      example: "I could run fast when I was young. / She was able to escape."
+    },
+    {
+      q: "You really _____ apologise — it wasn't your fault at all.",
+      badge: "💭 Shouldn't have",
+      options: ["shouldn't have", "mustn't have", "can't have", "needn't have"],
+      correct: 3,
+      explanation: "Needn't have — сделал что-то ненужное. Shouldn't have — сделал то, чего не стоило делать (упрёк/сожаление). Здесь: человек извинился без причины → needn't have.",
+      rule: "<b>needn't have</b> = не было необходимости | <b>shouldn't have</b> = не стоило (упрёк)",
+      example: "You needn't have bought flowers — but thank you!"
+    },
+    {
+      q: "By the time she's 30, she _____ finished her PhD.",
+      badge: "💭 Will have",
+      options: ["will have", "should have", "would have", "must have"],
+      correct: 0,
+      explanation: "Future Perfect (will have + V3) описывает действие, которое завершится к определённому моменту в будущем.",
+      rule: "<b>will have + V3</b> = Future Perfect (к тому времени)",
+      example: "By next year, I will have lived here for a decade."
+    },
+    {
+      q: "He _____ be at home — his car is in the driveway.",
+      badge: "💭 Must — deduction",
+      options: ["should", "must", "can", "would"],
+      correct: 1,
+      explanation: "Must — уверенный вывод на основе видимых фактов. Машина стоит → он дома.",
+      rule: "<b>must + infinitive</b> = логический вывод о настоящем",
+      example: "The lights are on — someone must be home."
+    },
+    {
+      q: "Would you mind _____ the window? It's quite cold.",
+      badge: "💭 Mind + -ing",
+      options: ["to close", "close", "closing", "closed"],
+      correct: 2,
+      explanation: "Mind всегда требует -ing форму (герундий). Would you mind — вежливая просьба.",
+      rule: "<b>mind + -ing</b> (герундий) — после mind всегда -ing",
+      example: "Do you mind waiting a few minutes?"
+    },
+    {
+      q: "You _____ have told me you were coming — I would have prepared.",
+      badge: "💭 Could have",
+      options: ["should", "could", "might", "would"],
+      correct: 0,
+      explanation: "Should have + V3 — упрёк или сожаление о прошлом: нужно было сделать, но не сделал.",
+      rule: "<b>should have + V3</b> = нужно было сделать, но не сделал",
+      example: "You should have checked the schedule before booking."
+    },
+    {
+      q: "She _____ be tired — she just got back from a long trip.",
+      badge: "💭 Must vs Might",
+      options: ["might", "must", "can", "should"],
+      correct: 1,
+      explanation: "Must — почти уверенный вывод. 'She just got back from a long trip' — это сильное основание для вывода об усталости.",
+      rule: "<b>must</b> = 90%+ уверенность | <b>might</b> = 50% и ниже",
+      example: "You've been working all day — you must be exhausted!"
+    },
+    {
+      q: "I _____ rather not discuss this in public.",
+      badge: "💭 Would rather",
+      options: ["would", "will", "should", "might"],
+      correct: 0,
+      explanation: "Would rather + infinitive (без to) — личное предпочтение. 'I'd rather not do something' — стандартная вежливая конструкция.",
+      rule: "<b>would rather + bare infinitive</b> = предпочитал бы",
+      example: "I'd rather stay at home tonight."
+    },
+  ],
+
+  // ─── B2: PHRASAL VERBS ───
+  b2_phrasal: [
+    {
+      q: "I finally _____ a solution to the problem after hours of thinking.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["came up with", "came across", "came around", "came up against"],
+      correct: 0,
+      explanation: "Come up with = придумать, найти идею/решение. Не путать с come across (случайно наткнуться) и come around (изменить мнение).",
+      rule: "<b>come up with</b> = to think of / invent an idea or solution",
+      example: "She came up with a brilliant plan to save costs."
+    },
+    {
+      q: "Don't _____ the meeting — it's very important.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["put off", "put out", "put up with", "put forward"],
+      correct: 0,
+      explanation: "Put off = откладывать на потом (delay). Put out = тушить огонь. Put up with = терпеть. Put forward = предлагать.",
+      rule: "<b>put off</b> = to delay or postpone something",
+      example: "Stop putting off your homework — do it now!"
+    },
+    {
+      q: "It took her months to _____ the shock of losing her job.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["get on with", "get over", "get through", "get by"],
+      correct: 1,
+      explanation: "Get over = оправиться (от болезни, шока, разрыва). Get through = пережить трудное время. Get on with = продолжать. Get by = справляться.",
+      rule: "<b>get over</b> = to recover from something difficult",
+      example: "He still hasn't got over the breakup."
+    },
+    {
+      q: "The meeting has been _____ until next week.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["brought forward", "called off", "put back", "set up"],
+      correct: 2,
+      explanation: "Put back = перенести на более поздний срок. Brought forward = перенести на более ранний срок. Called off = отменить.",
+      rule: "<b>put back</b> = перенести позже | <b>bring forward</b> = перенести раньше | <b>call off</b> = отменить",
+      example: "The deadline has been put back by two weeks."
+    },
+    {
+      q: "She _____ her mother more and more as she gets older.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["takes after", "takes up", "takes over", "takes on"],
+      correct: 0,
+      explanation: "Take after = быть похожим на родственника (внешне или характером). Take up = начать новое хобби. Take over = взять контроль.",
+      rule: "<b>take after</b> = to resemble a parent or relative",
+      example: "He takes after his father — same sense of humour."
+    },
+    {
+      q: "We need to _____ a few problems before we can launch the product.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["sort out", "sort through", "work out", "figure in"],
+      correct: 0,
+      explanation: "Sort out = разобраться с проблемой, уладить. Work out тоже возможно, но sort out — более идиоматично для 'решить проблему'.",
+      rule: "<b>sort out</b> = to resolve a problem or organise something",
+      example: "Let me sort out this misunderstanding."
+    },
+    {
+      q: "I can't _____ his behaviour — it's completely unacceptable.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["put up with", "put off", "carry on with", "go along with"],
+      correct: 0,
+      explanation: "Put up with = терпеть что-то неприятное (tolerate). Не путать с put off (откладывать) или go along with (соглашаться).",
+      rule: "<b>put up with</b> = to tolerate something unpleasant",
+      example: "How do you put up with all that noise?"
+    },
+    {
+      q: "The company has decided to _____ its plans to expand.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["carry out", "carry on with", "go ahead with", "call off"],
+      correct: 3,
+      explanation: "Call off = отменить (планы, мероприятие). Carry out = выполнять. Carry on = продолжать. Go ahead = приступать.",
+      rule: "<b>call off</b> = to cancel something that was planned",
+      example: "The concert was called off due to bad weather."
+    },
+    {
+      q: "She _____ painting as a hobby after retiring.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["took up", "took on", "took after", "took over"],
+      correct: 0,
+      explanation: "Take up = начать новое занятие/хобби. Take on = взять на себя ответственность. Take after = быть похожим.",
+      rule: "<b>take up</b> = to start a new hobby or activity",
+      example: "He took up cycling when he moved to Amsterdam."
+    },
+    {
+      q: "Please _____ the form and hand it in by Friday.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["fill in", "fill up", "fill out", "fill over"],
+      correct: 0,
+      explanation: "Fill in (UK) и fill out (US/neutral) — оба значат 'заполнить форму'. Fill up = наполнить до краёв (бак, стакан).",
+      rule: "<b>fill in / fill out</b> = заполнить форму | <b>fill up</b> = наполнить до краёв",
+      example: "Could you fill in this questionnaire?"
+    },
+    {
+      q: "The thief managed to _____ with over £10,000.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["get away", "get along", "break in", "run off with"],
+      correct: 3,
+      explanation: "Run off with = убежать с чем-то (украть и скрыться). Get away = сбежать (без объекта). Break in = взломать.",
+      rule: "<b>run off with</b> = to steal something and escape with it",
+      example: "He ran off with all her savings."
+    },
+    {
+      q: "I'm _____ learning Portuguese — it's challenging but fun.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["getting on with", "going on with", "coming up with", "keeping up with"],
+      correct: 0,
+      explanation: "Get on with = успешно продвигаться (в деле). Keep up with = успевать за чем-то. Оба могут использоваться, но get on with более идиоматично для прогресса.",
+      rule: "<b>get on with</b> = to make progress / to be doing well",
+      example: "How are you getting on with your thesis?"
+    },
+    {
+      q: "The new policy _____ as unfair by most employees.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["came across", "turned out", "went down", "came off"],
+      correct: 0,
+      explanation: "Come across as = производить впечатление, восприниматься (как). Здесь пассивный смысл, но come across лучше подходит.",
+      rule: "<b>come across as</b> = to give the impression of being",
+      example: "She came across as very confident during the interview."
+    },
+    {
+      q: "He's finding it hard to _____ with his more experienced colleagues.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["keep up", "catch on", "come up", "stand out"],
+      correct: 0,
+      explanation: "Keep up with = успевать за кем-то/чем-то, идти в ногу. Stand out = выделяться. Catch on = понять/стать популярным.",
+      rule: "<b>keep up with</b> = to maintain the same pace or level",
+      example: "It's hard to keep up with all the latest technology."
+    },
+    {
+      q: "The fire alarm went off and we had to _____ the building.",
+      badge: "⚙️ Phrasal Verbs",
+      options: ["clear out", "get out of", "evacuate from", "pull out"],
+      correct: 1,
+      explanation: "Get out of = выйти (из закрытого пространства — здания, машины). Clear out — освободить помещение от вещей. Evacuate from тоже возможно, но менее идиоматично.",
+      rule: "<b>get out of</b> = to exit an enclosed space",
+      example: "Everyone got out of the building when the alarm sounded."
+    },
+  ],
+
+  // ─── B2: PASSIVE ───
+  b2_passive: [
+    {
+      q: "The report _____ by the committee last week.",
+      badge: "🔄 Passive Voice",
+      options: ["is approved", "was approved", "has approved", "approved"],
+      correct: 1,
+      explanation: "Past Simple Passive: was/were + Past Participle. Здесь 'last week' указывает на прошлое время.",
+      rule: "<b>Past Simple Passive:</b> was/were + V3",
+      example: "The letter was signed by the director yesterday."
+    },
+    {
+      q: "A new hospital _____ in our city at the moment.",
+      badge: "🔄 Passive Voice",
+      options: ["is being built", "has been built", "was built", "is built"],
+      correct: 0,
+      explanation: "Present Continuous Passive: is/are + being + V3. 'At the moment' — маркер продолжающегося действия.",
+      rule: "<b>Present Continuous Passive:</b> is/are + being + V3",
+      example: "The road is being repaired this week."
+    },
+    {
+      q: "By the time we arrived, all the tickets _____ sold.",
+      badge: "🔄 Passive Voice",
+      options: ["had been", "were", "have been", "would be"],
+      correct: 0,
+      explanation: "Past Perfect Passive: had been + V3. Действие завершилось до другого момента в прошлом.",
+      rule: "<b>Past Perfect Passive:</b> had been + V3",
+      example: "By midnight, all the guests had been seated."
+    },
+    {
+      q: "The results _____ tomorrow morning.",
+      badge: "🔄 Passive Voice",
+      options: ["are announced", "will be announced", "are being announced", "announce"],
+      correct: 1,
+      explanation: "Future Simple Passive: will be + V3. Завтра = будущее время.",
+      rule: "<b>Future Simple Passive:</b> will be + V3",
+      example: "The winners will be announced at the ceremony."
+    },
+    {
+      q: "She _____ to present at the conference next month.",
+      badge: "🔄 Passive: be expected",
+      options: ["is expecting", "expects", "is expected", "was expected"],
+      correct: 2,
+      explanation: "Be expected to + infinitive — пассивная конструкция, означающая 'ожидается, что'. Типична в новостях и официальных текстах.",
+      rule: "<b>be expected to + infinitive</b> = считается/ожидается, что кто-то сделает что-то",
+      example: "He is expected to win the election."
+    },
+    {
+      q: "The old factory _____ into luxury apartments.",
+      badge: "🔄 Passive + convert",
+      options: ["has converted", "has been converted", "was converting", "converted"],
+      correct: 1,
+      explanation: "Present Perfect Passive: has/have been + V3. Акцент на результате, который виден сейчас.",
+      rule: "<b>Present Perfect Passive:</b> has/have been + V3",
+      example: "The building has been renovated recently."
+    },
+    {
+      q: "It is said that he _____ a fortune in the stock market.",
+      badge: "🔄 Impersonal Passive",
+      options: ["makes", "made", "has made", "make"],
+      correct: 2,
+      explanation: "It is said that + Perfect Infinitive (has + V3) — безличный пассив о прошлом. It is believed, reported, claimed — схожие конструкции.",
+      rule: "<b>It is said/believed/reported + that + clause</b>",
+      example: "It is believed that he has been hiding for months."
+    },
+    {
+      q: "The medicine _____ taken twice a day.",
+      badge: "🔄 Passive: instructions",
+      options: ["should be", "should", "must", "is"],
+      correct: 0,
+      explanation: "Should be + V3 — пассив с модальным глаголом. Используется для инструкций и рекомендаций.",
+      rule: "<b>modal + be + V3</b> = пассив с модальным глаголом",
+      example: "The form must be signed before submission."
+    },
+    {
+      q: "She _____ promoted next year if she continues to perform well.",
+      badge: "🔄 Passive Future",
+      options: ["will promote", "is being promoted", "will be promoted", "is promoted"],
+      correct: 2,
+      explanation: "Future Passive: will be + V3. Условие 'if she performs well' — это 1st Conditional в пассивном залоге.",
+      rule: "<b>will be + V3</b> = Future Simple Passive",
+      example: "You will be contacted if you are selected."
+    },
+    {
+      q: "The thief _____ by a security camera outside the bank.",
+      badge: "🔄 Passive: agent",
+      options: ["caught", "was caught", "has caught", "catching"],
+      correct: 1,
+      explanation: "Past Simple Passive: was + V3. Агент действия вводится через 'by'.",
+      rule: "<b>Пассив + by + агент</b> = кто совершил действие",
+      example: "The painting was created by Picasso."
+    },
+    {
+      q: "They _____ that the project will be completed on time.",
+      badge: "🔄 Passive: reporting",
+      options: ["are reported", "report", "are reporting", "is reported"],
+      correct: 0,
+      explanation: "They are reported that = формальный оборот, но точнее: It is reported that... или They report that... Здесь пассив с they корректен как вариант.",
+      rule: "<b>It is reported/claimed/believed + that</b> — предпочтительный безличный пассив",
+      example: "It is reported that the deal has been finalised."
+    },
+    {
+      q: "By next year, the bridge _____ for twenty years.",
+      badge: "🔄 Future Perfect Passive",
+      options: ["will be standing", "will have been standing", "will have been built", "has been built"],
+      correct: 1,
+      explanation: "Future Perfect Continuous Passive: will have been + -ing. Подчёркивает длительность действия к моменту в будущем.",
+      rule: "<b>will have been + -ing</b> = Future Perfect Continuous (Passive)",
+      example: "By 2030, she will have been working here for 15 years."
+    },
+  ],
+
+  // ─── B2: REPORTED SPEECH ───
+  b2_reported: [
+    {
+      q: "\"I am tired,\" she said. → She said that she _____ tired.",
+      badge: "💬 Reported Speech",
+      options: ["is", "was", "has been", "were"],
+      correct: 1,
+      explanation: "Backshift (сдвиг времён): Present Simple → Past Simple в косвенной речи. She said = past reporting verb → сдвиг обязателен.",
+      rule: "<b>Backshift:</b> am/is/are → was/were в косвенной речи",
+      example: "\"I'm happy\" → She said she was happy."
+    },
+    {
+      q: "\"I will call you tomorrow,\" he promised. → He promised that he _____ me the next day.",
+      badge: "💬 Reported Speech",
+      options: ["will call", "would call", "called", "has called"],
+      correct: 1,
+      explanation: "Will → Would в косвенной речи. Tomorrow → the next day (изменение наречия времени).",
+      rule: "<b>will → would</b> | tomorrow → the next day",
+      example: "\"I'll finish it\" → He promised he would finish it."
+    },
+    {
+      q: "\"Don't touch that!\" she told me. → She told me _____ touch that.",
+      badge: "💬 Reported Imperative",
+      options: ["don't", "not to", "to not", "not"],
+      correct: 1,
+      explanation: "Косвенный приказ/просьба: tell/ask someone + not to + infinitive. Отрицание всегда через not to.",
+      rule: "<b>Reported imperative:</b> told/asked + (not) to + infinitive",
+      example: "\"Sit down\" → She told us to sit down."
+    },
+    {
+      q: "\"Have you seen the new film?\" he asked me. → He asked me _____ the new film.",
+      badge: "💬 Reported Question",
+      options: ["if I have seen", "whether I had seen", "had I seen", "if had I seen"],
+      correct: 1,
+      explanation: "Вопросы в косвенной речи: порядок слов — как в утверждении (не инвертированный). Yes/no вопросы → whether/if.",
+      rule: "<b>Yes/No вопрос:</b> asked + whether/if + subject + verb (backshift)",
+      example: "\"Are you coming?\" → She asked if I was coming."
+    },
+    {
+      q: "\"I can help you,\" she offered. → She offered _____ me.",
+      badge: "💬 Reported Offer",
+      options: ["to help", "helping", "that she helps", "help"],
+      correct: 0,
+      explanation: "Offer/agree/refuse/promise/manage → + to + infinitive. Это reporting verbs с инфинитивом.",
+      rule: "<b>offer/agree/refuse + to + infinitive</b>",
+      example: "She offered to drive us to the airport."
+    },
+    {
+      q: "\"You must submit the report by Monday,\" the boss said. → The boss told us we _____ the report by Monday.",
+      badge: "💬 Reported Speech",
+      options: ["must submit", "had to submit", "should submit", "needed to submit"],
+      correct: 1,
+      explanation: "Must → had to в косвенной речи (при прошедшем reporting verb). Have to → had to тоже.",
+      rule: "<b>must → had to</b> в косвенной речи",
+      example: "\"You must leave\" → He said we had to leave."
+    },
+    {
+      q: "\"I'm meeting her at noon tomorrow.\" → She said she _____ her at noon the following day.",
+      badge: "💬 Reported Speech",
+      options: ["is meeting", "was meeting", "met", "had met"],
+      correct: 1,
+      explanation: "Present Continuous → Past Continuous в backshift. Tomorrow → the following day.",
+      rule: "<b>is/are + -ing → was/were + -ing</b> | tomorrow → the following day",
+      example: "\"I'm leaving\" → She said she was leaving."
+    },
+    {
+      q: "\"Where did you go last night?\" he asked her. → He asked her _____ the night before.",
+      badge: "💬 Reported Wh-Question",
+      options: ["where had she gone", "where she had gone", "where she went", "where did she go"],
+      correct: 1,
+      explanation: "Wh-вопросы: where/when/why + subject + verb (не инвертированный порядок). Backshift: did go → had gone.",
+      rule: "<b>Wh-вопрос:</b> asked + where/when/why + subject + verb (backshift)",
+      example: "\"What did you do?\" → She asked what he had done."
+    },
+    {
+      q: "\"I haven't finished my homework yet,\" he admitted. → He admitted that he _____ his homework yet.",
+      badge: "💬 Reported Speech",
+      options: ["hasn't finished", "hadn't finished", "didn't finish", "not finished"],
+      correct: 1,
+      explanation: "Present Perfect → Past Perfect в backshift. Yet остаётся без изменений в косвенной речи.",
+      rule: "<b>has/have + V3 → had + V3</b> (Present Perfect → Past Perfect)",
+      example: "\"I've read it\" → He said he had read it."
+    },
+    {
+      q: "\"Please sit down,\" the teacher said. → The teacher asked us _____ down.",
+      badge: "💬 Reported Request",
+      options: ["sit", "to sit", "sitting", "that we sit"],
+      correct: 1,
+      explanation: "Ask someone to do something — это reported request. Please в косвенной речи исчезает, остаётся: asked + to + infinitive.",
+      rule: "<b>asked + (object) + to + infinitive</b> = вежливая просьба",
+      example: "\"Please wait outside\" → She asked us to wait outside."
+    },
+    {
+      q: "\"I didn't break the vase,\" he insisted. → He insisted that he _____ the vase.",
+      badge: "💬 Reported Speech",
+      options: ["didn't break", "hadn't broken", "hasn't broken", "not break"],
+      correct: 1,
+      explanation: "Past Simple → Past Perfect в backshift. Negation сохраняется через hadn't.",
+      rule: "<b>didn't + V1 → hadn't + V3</b> в косвенной речи",
+      example: "\"I didn't see her\" → He said he hadn't seen her."
+    },
+    {
+      q: "\"You should see a doctor,\" she suggested. → She suggested that I _____ a doctor.",
+      badge: "💬 Reported Suggestion",
+      options: ["should see", "see", "to see", "saw"],
+      correct: 0,
+      explanation: "Suggest + that-clause: should остаётся без изменений (модальный глагол). Но: suggest + -ing тоже возможно ('She suggested seeing a doctor').",
+      rule: "<b>suggest + that + should + infinitive</b> OR <b>suggest + -ing</b>",
+      example: "He suggested that we should leave early."
+    },
+  ],
+
+  // ─── C1: INVERSION ───
+  c1_inversion: [
+    {
+      q: "_____ have I seen such a magnificent performance!",
+      badge: "🔃 Инверсия",
+      options: ["Not only", "Rarely", "Never", "Seldom"],
+      correct: 2,
+      explanation: "Never + инверсия: вспомогательный глагол перед подлежащим. Never have I seen = I have never seen — усиление отрицания. Типично для C1 эссе.",
+      rule: "<b>Never / Seldom / Rarely + вспом. глагол + подлежащее</b>",
+      example: "Never have I witnessed such bravery."
+    },
+    {
+      q: "Hardly _____ sat down when the phone rang.",
+      badge: "🔃 Инверсия",
+      options: ["I had", "had I", "I have", "have I"],
+      correct: 1,
+      explanation: "Hardly/Scarcely + had + подлежащее = едва… как. Инверсия обязательна после отрицательных наречий в начале предложения.",
+      rule: "<b>Hardly/Scarcely + had + subject</b> ... when/before",
+      example: "Hardly had she arrived when the meeting started."
+    },
+    {
+      q: "Not only _____ rude, but she also refused to apologise.",
+      badge: "🔃 Инверсия",
+      options: ["she was", "was she", "she has been", "has been she"],
+      correct: 1,
+      explanation: "Not only + инверсия в первой части, but also — во второй (без инверсии). Not only + was/did/is перед подлежащим.",
+      rule: "<b>Not only + вспом. глагол + subject</b>, but also + normal order",
+      example: "Not only did he fail, but he also gave up."
+    },
+    {
+      q: "_____ you need any assistance, please do not hesitate to call.",
+      badge: "🔃 Инверсия",
+      options: ["Were", "Should", "Had", "Would"],
+      correct: 1,
+      explanation: "Should + инверсия = формальная замена If… ever. Should you need = If you (ever) need. Типичная деловая переписка.",
+      rule: "<b>Should + subject + infinitive</b> = If + subject + should + infinitive (формально)",
+      example: "Should you have any questions, please contact us."
+    },
+    {
+      q: "Under no circumstances _____ the building without permission.",
+      badge: "🔃 Инверсия",
+      options: ["you should enter", "should you enter", "you enter", "enter you"],
+      correct: 1,
+      explanation: "Under no circumstances — отрицательное выражение в начале предложения → обязательная инверсия.",
+      rule: "<b>Under no circumstances / On no account + вспом. глагол + subject</b>",
+      example: "Under no circumstances should you share your password."
+    },
+    {
+      q: "Only after she had read the letter _____ the truth.",
+      badge: "🔃 Инверсия",
+      options: ["she realised", "did she realise", "had she realised", "she has realised"],
+      correct: 1,
+      explanation: "Only after/when/if + инверсия в главном предложении. Если в subordinate clause — Past Perfect, то в главном Past Simple с инверсией.",
+      rule: "<b>Only after + clause + did/was + subject + infinitive</b>",
+      example: "Only when she arrived did the party begin."
+    },
+    {
+      q: "So exhausted _____ that she fell asleep immediately.",
+      badge: "🔃 Инверсия",
+      options: ["she was", "was she", "she felt", "felt she"],
+      correct: 1,
+      explanation: "So + adjective/adverb → инверсия: So tired was he that… = He was so tired that… Эмфатическая конструкция C1.",
+      rule: "<b>So + adjective + was/is + subject + that</b>",
+      example: "So brilliant was her speech that everyone applauded."
+    },
+    {
+      q: "_____ I known about the delay, I would have left earlier.",
+      badge: "🔃 Инверсия",
+      options: ["Should", "Were", "Had", "Would"],
+      correct: 2,
+      explanation: "Had + subject + V3 = If + subject + had + V3 (3rd Conditional с инверсией). Формальная письменная форма.",
+      rule: "<b>Had + subject + V3</b> = If + subject + had + V3 (3rd cond.)",
+      example: "Had she arrived on time, she would have met him."
+    },
+    {
+      q: "Not until midnight _____ finally able to relax.",
+      badge: "🔃 Инверсия",
+      options: ["she was", "was she", "she felt", "did she feel"],
+      correct: 1,
+      explanation: "Not until + time expression → инверсия (was/did + subject). Здесь: 'was she' — это Past Simple пассивная форма прилагательного.",
+      rule: "<b>Not until + time/event + was/did + subject</b>",
+      example: "Not until Monday did the results arrive."
+    },
+    {
+      q: "Such was his confidence _____ everyone believed him.",
+      badge: "🔃 Инверсия",
+      options: ["as", "so", "that", "and"],
+      correct: 2,
+      explanation: "Such was + noun → that: Such was his confidence that… = His confidence was so great that… Усиленная конструкция.",
+      rule: "<b>Such was + noun + that</b> = …was so great that",
+      example: "Such was his dedication that he worked through the night."
+    },
+    {
+      q: "No sooner _____ the door than the alarm went off.",
+      badge: "🔃 Инверсия",
+      options: ["I had opened", "had I opened", "did I open", "I opened"],
+      correct: 1,
+      explanation: "No sooner + had + subject = едва… как. Вместе с 'than' в следующей части. No sooner = Hardly/Scarcely (но + than, не when).",
+      rule: "<b>No sooner had + subject + V3</b> ... than",
+      example: "No sooner had we left than it started raining."
+    },
+    {
+      q: "Little _____ that the situation would turn so serious.",
+      badge: "🔃 Инверсия",
+      options: ["she knew", "did she know", "she did know", "had she known"],
+      correct: 1,
+      explanation: "Little + инверсия с did + subject. Little = hardly anything → вводит инверсию. Характерно для нарратива C1.",
+      rule: "<b>Little + did + subject + know</b> = и не подозревал(-а), что",
+      example: "Little did he know what was waiting for him."
+    },
+    {
+      q: "Rarely _____ such an opportunity to travel for free.",
+      badge: "🔃 Инверсия",
+      options: ["people get", "do people get", "did people get", "have people gotten"],
+      correct: 1,
+      explanation: "Rarely + инверсия с вспомогательным do/does/did. Здесь Present Simple → do people get.",
+      rule: "<b>Rarely/Seldom + do/does/did + subject + infinitive</b>",
+      example: "Seldom does she make a mistake."
+    },
+    {
+      q: "Only by working together _____ we solve this crisis.",
+      badge: "🔃 Инверсия",
+      options: ["can", "we can", "do", "are"],
+      correct: 0,
+      explanation: "Only by + -ing → инверсия: вспомогательный глагол перед подлежащим. Only by working = только путём совместной работы.",
+      rule: "<b>Only by + -ing + can/could/will + subject</b>",
+      example: "Only by saving money can you afford to travel."
+    },
+    {
+      q: "In no way _____ responsible for what happened.",
+      badge: "🔃 Инверсия",
+      options: ["I am", "am I", "I was", "was I"],
+      correct: 1,
+      explanation: "In no way — отрицательное выражение → инверсия. Здесь Present Simple → am I. Типично для опровержений.",
+      rule: "<b>In no way + am/is/are/was + subject</b>",
+      example: "In no way is this decision final."
+    },
+  ],
+
+  // ─── C1: SUBJUNCTIVE ───
+  c1_subjunctive: [
+    {
+      q: "I wish I _____ the answer right now.",
+      badge: "🌀 Сослагательное",
+      options: ["know", "knew", "had known", "would know"],
+      correct: 1,
+      explanation: "Wish + Past Simple = нереальное желание о настоящем/будущем. 'Right now' подтверждает — это настоящее. Would know — ошибка: wish + would только для чужого поведения.",
+      rule: "<b>wish + Past Simple</b> = нереальное желание сейчас",
+      example: "I wish I spoke better French."
+    },
+    {
+      q: "If only she _____ so stubborn!",
+      badge: "🌀 Сослагательное",
+      options: ["isn't", "wasn't / weren't", "wouldn't be", "hadn't been"],
+      correct: 1,
+      explanation: "If only + Past Simple = раздражение/желание о настоящем. Для 'be' в формальном стиле предпочтительнее were, но wasn't тоже принято.",
+      rule: "<b>if only + Past Simple/were</b> = сожаление о настоящем",
+      example: "If only he weren't so arrogant!"
+    },
+    {
+      q: "She looked as if she _____ for days.",
+      badge: "🌀 As if (нереальное)",
+      options: ["hasn't slept", "didn't sleep", "hadn't slept", "wouldn't sleep"],
+      correct: 2,
+      explanation: "As if + Past Perfect = нереальное состояние в прошлом. 'She hadn't slept' — она, вероятно, спала, но выглядела так, будто нет.",
+      rule: "<b>as if/as though + Past Perfect</b> = нереальное сравнение в прошлом",
+      example: "He spoke as if he had known her for years."
+    },
+    {
+      q: "It's time the government _____ action on climate change.",
+      badge: "🌀 It's time",
+      options: ["takes", "took", "take", "has taken"],
+      correct: 1,
+      explanation: "It's (high) time + Past Simple — устойчивая конструкция для выражения 'пора бы уже'. Прошедшее время здесь условное, не реальное.",
+      rule: "<b>It's (high) time + Past Simple</b> = давно пора",
+      example: "It's high time you apologised."
+    },
+    {
+      q: "The committee recommends that every student _____ the course.",
+      badge: "🌀 Mandative Subjunctive",
+      options: ["completes", "complete", "completed", "has completed"],
+      correct: 1,
+      explanation: "Mandative Subjunctive: после глаголов suggest, recommend, insist, demand + that → bare infinitive (без -s, без to).",
+      rule: "<b>recommend/suggest/insist + that + subject + bare infinitive</b>",
+      example: "She suggested that he apply for the scholarship."
+    },
+    {
+      q: "I wish you _____ so much noise at night!",
+      badge: "🌀 Wish + would",
+      options: ["don't make", "didn't make", "wouldn't make", "hadn't made"],
+      correct: 2,
+      explanation: "Wish + would + infinitive = раздражение от чужого поведения. Используется только для ДРУГОГО человека, не для себя.",
+      rule: "<b>wish + would + infinitive</b> = желание изменить чьё-то поведение",
+      example: "I wish the neighbours would be quieter."
+    },
+    {
+      q: "I wish I _____ harder at school — I'd have better prospects now.",
+      badge: "🌀 Wish + Past Perfect",
+      options: ["studied", "had studied", "would study", "would have studied"],
+      correct: 1,
+      explanation: "Wish + Past Perfect = сожаление о прошлом. Изменить нельзя. Часто сочетается со смешанным условным в главной части.",
+      rule: "<b>wish + Past Perfect</b> = сожаление о прошедшем",
+      example: "I wish I had taken that job offer."
+    },
+    {
+      q: "It is essential that the patient _____ informed before the procedure.",
+      badge: "🌀 Mandative Subjunctive",
+      options: ["is", "be", "was", "were"],
+      correct: 1,
+      explanation: "После adjectives: essential, vital, important, necessary + that → bare infinitive (be, not is). Это mandative subjunctive, типичный для формальных текстов.",
+      rule: "<b>It is essential/vital/important + that + subject + bare infinitive</b>",
+      example: "It is vital that he be present at the hearing."
+    },
+    {
+      q: "She acted as though she _____ the owner of the place.",
+      badge: "🌀 As though",
+      options: ["is", "was / were", "has been", "will be"],
+      correct: 1,
+      explanation: "As though + Past Simple/were = нереальное поведение в настоящем. В формальном стиле — were для всех лиц.",
+      rule: "<b>as if/as though + Past Simple/were</b> = нереальное настоящее",
+      example: "He talks as though he knows everything."
+    },
+    {
+      q: "They demanded that the manager _____ immediately.",
+      badge: "🌀 Mandative Subjunctive",
+      options: ["resigns", "resign", "resigned", "to resign"],
+      correct: 1,
+      explanation: "Demand + that → bare infinitive. Без -s, без to, без -ed. Это subjunctive, не обычная форма глагола.",
+      rule: "<b>demand/require/insist + that + subject + bare infinitive</b>",
+      example: "The judge ordered that the prisoner be released."
+    },
+    {
+      q: "If only I _____ more time — I could finish this project.",
+      badge: "🌀 If only — present",
+      options: ["have", "had", "would have", "have had"],
+      correct: 1,
+      explanation: "If only + Past Simple = нереальное желание о настоящем. 'Could finish' в главной части подтверждает — речь идёт о сейчас.",
+      rule: "<b>if only + Past Simple</b> = жаль, что сейчас не так",
+      example: "If only I had a car — I'd be there by now."
+    },
+    {
+      q: "Suppose you _____ famous — would you move abroad?",
+      badge: "🌀 Suppose + Past",
+      options: ["become", "became", "had become", "would become"],
+      correct: 1,
+      explanation: "Suppose/supposing + Past Simple = нереальная/гипотетическая ситуация в настоящем. Синоним 'if' во 2nd Conditional.",
+      rule: "<b>suppose/supposing + Past Simple</b> = гипотетическая ситуация",
+      example: "Supposing she said yes — what would you do next?"
+    },
+    {
+      q: "It's time we _____ this conversation.",
+      badge: "🌀 It's time",
+      options: ["end", "ended", "have ended", "would end"],
+      correct: 1,
+      explanation: "It's time + Past Simple — относится к группе 'unreal past' конструкций. Означает 'сейчас пора сделать это'.",
+      rule: "<b>It's time + Past Simple</b> (не infinitive!)",
+      example: "It's time we left — it's getting late."
+    },
+    {
+      q: "He behaved as if nothing _____ .",
+      badge: "🌀 As if — past unreal",
+      options: ["happened", "had happened", "was happening", "would happen"],
+      correct: 1,
+      explanation: "As if + Past Perfect = нереальное прошлое. Что-то случилось, но он вёл себя так, будто ничего не было.",
+      rule: "<b>as if + Past Perfect</b> = нереальное прошедшее состояние",
+      example: "She smiled as if nothing had gone wrong."
+    },
+    {
+      q: "I would rather you _____ about this for now.",
+      badge: "🌀 Would rather (other person)",
+      options: ["don't know", "didn't know", "wouldn't know", "hadn't known"],
+      correct: 1,
+      explanation: "Would rather + someone + Past Simple = предпочтение насчёт действия другого человека. Прошедшее время — нереальное, относится к настоящему/будущему.",
+      rule: "<b>would rather + person + Past Simple</b> (о другом человеке, о настоящем)",
+      example: "I'd rather she came tomorrow, not today."
+    },
+  ],
+
+  // ─── C1: MIXED CONDITIONALS ───
+  c1_mixed_cond: [
+    {
+      q: "If she had taken the job, she _____ in Paris now.",
+      badge: "🎭 Mixed Conditional",
+      options: ["would be living", "would have lived", "had been living", "was living"],
+      correct: 0,
+      explanation: "Смешанное условие: If + Past Perfect (3rd cond.) → would + be + -ing (2nd cond.). Прошлое условие → настоящий результат.",
+      rule: "<b>If + Past Perfect → would + be/infinitive</b> (прошлое → настоящее)",
+      example: "If I had studied medicine, I would be a doctor now."
+    },
+    {
+      q: "If I were more disciplined, I _____ finished the book by now.",
+      badge: "🎭 Mixed Conditional",
+      options: ["would have", "would", "had", "will have"],
+      correct: 0,
+      explanation: "Смешанное условие: If + Past Simple/were (2nd) → would have + V3 (3rd). Настоящее качество → прошлый результат.",
+      rule: "<b>If + Past Simple → would have + V3</b> (настоящее → прошлое)",
+      example: "If she were more careful, she wouldn't have made this mistake."
+    },
+    {
+      q: "Had the medicine been discovered earlier, millions _____ alive today.",
+      badge: "🎭 Mixed Cond. + Inversion",
+      options: ["would still be", "would have been", "were", "will be"],
+      correct: 0,
+      explanation: "Had + V3 = If + Past Perfect. Результат в настоящем → would + be. Инверсия указывает на формальный стиль.",
+      rule: "<b>Had + V3 (инверсия 3rd cond.) → would + be</b> (настоящий результат)",
+      example: "Had he survived, he would be 100 today."
+    },
+    {
+      q: "Were he more patient, he _____ have handled the situation better.",
+      badge: "🎭 Mixed Cond. + Inversion",
+      options: ["would", "could", "might", "would have"],
+      correct: 3,
+      explanation: "Were + subject (инверсия 2nd cond.) → would have + V3 (результат в прошлом). Характеристика человека в настоящем → прошлый результат.",
+      rule: "<b>Were + subject (2nd cond.) → would have + V3</b>",
+      example: "Were she less impulsive, she wouldn't have quit."
+    },
+    {
+      q: "If the war hadn't happened, the city _____ much more developed now.",
+      badge: "🎭 Mixed Conditional",
+      options: ["would be", "would have been", "had been", "were"],
+      correct: 0,
+      explanation: "Прошлое событие (война) → нынешнее состояние. If + Past Perfect → would + be (настоящее).",
+      rule: "<b>If + hadn't + V3 → would be + adjective/noun</b> (сейчас)",
+      example: "If he hadn't emigrated, he would be working here now."
+    },
+    {
+      q: "She is so talented — if she had practised more, she _____ a world-class pianist.",
+      badge: "🎭 Mixed Conditional",
+      options: ["would be", "would have become", "had become", "became"],
+      correct: 1,
+      explanation: "Говорящий предполагает: если бы она тренировалась в прошлом, сейчас она стала бы (результат в прошлом или настоящем). Здесь would have become = прошлый результат.",
+      rule: "Контекст подсказывает направление: past condition → past result (would have + V3)",
+      example: "If he had trained harder, he would have become a champion."
+    },
+    {
+      q: "If I hadn't met her, I _____ so happy right now.",
+      badge: "🎭 Mixed Conditional",
+      options: ["wouldn't be", "wouldn't have been", "hadn't been", "wasn't"],
+      correct: 0,
+      explanation: "If + Past Perfect → wouldn't be + adjective сейчас. Прошлое событие определяет настоящее состояние.",
+      rule: "<b>If + hadn't + V3 → wouldn't be</b> (настоящее состояние)",
+      example: "If I hadn't taken that course, I wouldn't be this confident."
+    },
+    {
+      q: "Unless he had apologised, she _____ him again.",
+      badge: "🎭 Unless + 3rd Cond.",
+      options: ["wouldn't have seen", "wouldn't see", "won't see", "hadn't seen"],
+      correct: 0,
+      explanation: "Unless + Past Perfect → would have (3rd Conditional). Unless = if not. Нереальная прошлая ситуация.",
+      rule: "<b>Unless + Past Perfect → would have + V3</b> (3rd cond.)",
+      example: "Unless he had apologised, she wouldn't have forgiven him."
+    },
+    {
+      q: "Provided she had signed the contract, the deal _____ .",
+      badge: "🎭 Provided + 3rd Cond.",
+      options: ["would be sealed", "would have been sealed", "had been sealed", "is sealed"],
+      correct: 1,
+      explanation: "Provided + Past Perfect = формальная форма 3rd Conditional. Результат: would have been sealed (Past Perfect Passive).",
+      rule: "<b>Provided + Past Perfect → would have been + V3</b>",
+      example: "Provided he had studied, he would have passed."
+    },
+    {
+      q: "If only she hadn't said that — things _____ so different now.",
+      badge: "🎭 If only — Mixed",
+      options: ["would be", "would have been", "were", "had been"],
+      correct: 0,
+      explanation: "If only + Past Perfect = сожаление о прошлом, но последствие — сейчас (would be). Смешанная конструкция.",
+      rule: "<b>if only + Past Perfect → would be</b> (настоящий результат)",
+      example: "If only I hadn't told her — she would still be here."
+    },
+    {
+      q: "But for her help, I _____ the project on time.",
+      badge: "🎭 But for = If not for",
+      options: ["wouldn't have completed", "wouldn't complete", "hadn't completed", "didn't complete"],
+      correct: 0,
+      explanation: "But for = if it hadn't been for. Указывает на 3rd Conditional: прошлое условие → would have + V3.",
+      rule: "<b>But for + noun → would have + V3</b> (3rd cond.)",
+      example: "But for his intervention, the deal would have collapsed."
+    },
+    {
+      q: "It's too late now — if we had set off earlier, we _____ there by now.",
+      badge: "🎭 Mixed Conditional",
+      options: ["would be", "would have been", "had been", "were"],
+      correct: 0,
+      explanation: "По смыслу: прошлое условие (set off earlier) → настоящее состояние (сейчас уже там). Поэтому would be, не would have been.",
+      rule: "<b>If + Past Perfect → would be</b> (состояние сейчас)",
+      example: "If I had left at 8, I would already be home."
+    },
+  ],
+
+  // ─── C1: IDIOMS ───
+  c1_idioms: [
+    {
+      q: "She has a lot on her plate right now — don't add to her stress.",
+      badge: "🗣️ Идиомы",
+      options: ["Она хорошо кушает", "У неё много дел/забот", "Она полная", "Ей нравится еда"],
+      correct: 1,
+      explanation: "Have a lot on one's plate = быть очень занятым, иметь много обязанностей. Буквальный смысл не имеет отношения к тарелке.",
+      rule: "<b>have a lot on one's plate</b> = to be very busy",
+      example: "I can't help you this week — I've got a lot on my plate."
+    },
+    {
+      q: "The new manager is trying to bite off more than she can chew.",
+      badge: "🗣️ Идиомы",
+      options: ["Она плохо ест", "Она слишком осторожна", "Она берётся за больше, чем может осилить", "Она критикует других"],
+      correct: 2,
+      explanation: "Bite off more than you can chew = браться за слишком многое, недооценивать сложность задачи.",
+      rule: "<b>bite off more than you can chew</b> = take on more than you can handle",
+      example: "He bit off more than he could chew by accepting three projects at once."
+    },
+    {
+      q: "Let's not beat around the bush — tell me exactly what happened.",
+      badge: "🗣️ Идиомы",
+      options: ["Не ходи вокруг кустов", "Не уклоняйся от темы", "Не торопись", "Не спорь"],
+      correct: 1,
+      explanation: "Beat around the bush = уклоняться от сути, говорить обиняками. Антоним: get straight to the point.",
+      rule: "<b>beat around the bush</b> = to avoid the main topic",
+      example: "Stop beating around the bush and give me a straight answer."
+    },
+    {
+      q: "His business idea was a real shot in the dark.",
+      badge: "🗣️ Идиомы",
+      options: ["Очень рискованная затея", "Блестящая идея", "Безопасный план", "Тёмная история"],
+      correct: 0,
+      explanation: "A shot in the dark = попытка наугад, рискованная догадка без достаточной информации.",
+      rule: "<b>a shot in the dark</b> = a guess with little chance of success",
+      example: "Applying without experience was a shot in the dark, but it paid off."
+    },
+    {
+      q: "The two companies decided to bury the hatchet after years of rivalry.",
+      badge: "🗣️ Идиомы",
+      options: ["Скрыть убытки", "Помириться и забыть прошлое", "Уничтожить конкурента", "Объединить ресурсы"],
+      correct: 1,
+      explanation: "Bury the hatchet = помириться, прекратить вражду. Происходит из традиции индейцев закапывать оружие как знак мира.",
+      rule: "<b>bury the hatchet</b> = to make peace / end a conflict",
+      example: "After the argument, they decided to bury the hatchet."
+    },
+    {
+      q: "She passed the exam with flying colours.",
+      badge: "🗣️ Идиомы",
+      options: ["Кое-как сдала", "Сдала с отличием/блестяще", "Провалилась", "Сдала после пересдачи"],
+      correct: 1,
+      explanation: "Pass with flying colours = сдать/пройти с блеском, с отличным результатом. Colours = флаги победы.",
+      rule: "<b>pass with flying colours</b> = to succeed brilliantly",
+      example: "He passed his driving test with flying colours on the first attempt."
+    },
+    {
+      q: "Learning a new language is no walk in the park.",
+      badge: "🗣️ Идиомы",
+      options: ["Это невозможно", "Это не прогулка", "Это нелегко", "Это занимает много времени"],
+      correct: 2,
+      explanation: "No walk in the park = нелёгкое дело, непросто. Обычно используется с отрицанием для усиления.",
+      rule: "<b>(not) a walk in the park</b> = (not) easy",
+      example: "Running a startup is no walk in the park."
+    },
+    {
+      q: "He got cold feet before the presentation.",
+      badge: "🗣️ Идиомы",
+      options: ["Замёрз", "Заболел", "Испугался и засомневался в последний момент", "Опоздал"],
+      correct: 2,
+      explanation: "Get cold feet = испугаться, передумать в последний момент из-за страха или сомнений.",
+      rule: "<b>get cold feet</b> = to become nervous and hesitant",
+      example: "She got cold feet before the wedding and postponed it."
+    },
+    {
+      q: "That new film is on the tip of my tongue — what's it called?",
+      badge: "🗣️ Идиомы",
+      options: ["Мне это неизвестно", "Слово/название вертится на языке", "Мне нравится этот фильм", "Я недавно посмотрел его"],
+      correct: 1,
+      explanation: "On the tip of one's tongue = слово или название вертится на языке, почти вспомнил, но не могу сказать.",
+      rule: "<b>on the tip of one's tongue</b> = almost remembered but can't recall",
+      example: "His name is on the tip of my tongue — give me a second."
+    },
+    {
+      q: "She's been under the weather lately.",
+      badge: "🗣️ Идиомы",
+      options: ["Она занята", "Она немного нездорова", "Она расстроена из-за погоды", "Она много работает"],
+      correct: 1,
+      explanation: "Under the weather = немного нездоровится, чувствовать себя не в своей тарелке (мягкое недомогание).",
+      rule: "<b>under the weather</b> = feeling slightly ill",
+      example: "I'm feeling a bit under the weather — I might skip the party."
+    },
+    {
+      q: "The new policy went down like a lead balloon.",
+      badge: "🗣️ Идиомы",
+      options: ["Была встречена с энтузиазмом", "Была принята безразлично", "Провалилась / была встречена очень негативно", "Была введена постепенно"],
+      correct: 2,
+      explanation: "Go down like a lead balloon = быть принятым крайне плохо, провалиться (о шутке, идее, предложении).",
+      rule: "<b>go down like a lead balloon</b> = to be very badly received",
+      example: "His joke went down like a lead balloon at the funeral."
+    },
+    {
+      q: "He keeps throwing spanners in the works.",
+      badge: "🗣️ Идиомы",
+      options: ["Он активно помогает", "Он постоянно мешает / создаёт проблемы", "Он много работает", "Он теряет инструменты"],
+      correct: 1,
+      explanation: "Throw a spanner in the works (UK) / throw a wrench in the works (US) = намеренно или случайно мешать чьим-то планам.",
+      rule: "<b>throw a spanner in the works</b> = to create obstacles or problems",
+      example: "Every time we agree on something, he throws a spanner in the works."
+    },
+    {
+      q: "The solution was staring us in the face the whole time.",
+      badge: "🗣️ Идиомы",
+      options: ["Решение было очень трудным", "Решение было очевидным, но мы его не замечали", "Кто-то подсказал нам ответ", "Нам долго пришлось искать"],
+      correct: 1,
+      explanation: "Stare someone in the face = быть совершенно очевидным, находиться прямо перед носом (но не замеченным).",
+      rule: "<b>stare someone in the face</b> = to be very obvious but unnoticed",
+      example: "The answer was staring me in the face — I just wasn't looking."
+    },
+    {
+      q: "Let's cross that bridge when we come to it.",
+      badge: "🗣️ Идиомы",
+      options: ["Давай найдём новый путь", "Решим эту проблему, когда она возникнет", "Не будем избегать трудностей", "Встретимся позже"],
+      correct: 1,
+      explanation: "Cross that bridge when you come to it = не беспокоиться заранее, разберёмся с проблемой, когда она реально возникнет.",
+      rule: "<b>cross that bridge when you come to it</b> = deal with it when the time comes",
+      example: "We'll cross that bridge when we come to it — no need to worry now."
+    },
+    {
+      q: "After years of hard work, success finally came out of the blue.",
+      badge: "🗣️ Идиомы",
+      options: ["После долгих усилий", "Неожиданно / как гром среди ясного неба", "Синего цвета", "Благодаря связям"],
+      correct: 1,
+      explanation: "Out of the blue = совершенно неожиданно, без предупреждения. Как молния из ясного синего неба.",
+      rule: "<b>out of the blue</b> = unexpectedly, without warning",
+      example: "He called me out of the blue after five years of silence."
+    },
+  ],
+
+  // ─── C1: COLLOCATIONS ───
+  c1_collocations: [
+    {
+      q: "She managed to _____ a compromise after hours of negotiation.",
+      badge: "🔗 Коллокации",
+      options: ["do", "make", "reach", "get"],
+      correct: 2,
+      explanation: "Reach a compromise — устойчивое сочетание. Make a compromise — менее идиоматично. Do/get не используются с compromise.",
+      rule: "<b>reach a compromise / agreement / conclusion / decision</b>",
+      example: "Both sides were finally able to reach an agreement."
+    },
+    {
+      q: "The new law will _____ a significant impact on small businesses.",
+      badge: "🔗 Коллокации",
+      options: ["do", "have", "make", "give"],
+      correct: 1,
+      explanation: "Have an impact / effect / influence — устойчивые коллокации. Make an impact тоже возможно, но have — более нейтральное и распространённое.",
+      rule: "<b>have an impact/effect/influence on</b>",
+      example: "This discovery will have a profound effect on medicine."
+    },
+    {
+      q: "He _____ a great deal of pressure from his manager.",
+      badge: "🔗 Коллокации",
+      options: ["felt", "received", "was under", "had"],
+      correct: 2,
+      explanation: "Be under pressure — устойчивая коллокация. Feel/receive pressure — менее идиоматично в данном контексте.",
+      rule: "<b>be under pressure / stress / threat</b>",
+      example: "She was under enormous pressure to deliver results."
+    },
+    {
+      q: "The company decided to _____ a survey among its customers.",
+      badge: "🔗 Do vs Make",
+      options: ["make", "have", "conduct", "take"],
+      correct: 2,
+      explanation: "Conduct a survey — книжная/деловая коллокация. Do a survey тоже возможно, но conduct — более формально и точно для C1.",
+      rule: "<b>conduct / carry out a survey/research/experiment</b>",
+      example: "They conducted a thorough investigation into the matter."
+    },
+    {
+      q: "She _____ her temper during the heated argument.",
+      badge: "🔗 Коллокации",
+      options: ["lost", "dropped", "had", "missed"],
+      correct: 0,
+      explanation: "Lose one's temper = выйти из себя, потерять самообладание. Drop/miss не используются с temper.",
+      rule: "<b>lose one's temper / patience / confidence / balance</b>",
+      example: "He rarely loses his temper, no matter how stressful the situation."
+    },
+    {
+      q: "The project is _____ schedule and should be completed by Friday.",
+      badge: "🔗 Коллокации",
+      options: ["on", "in", "at", "by"],
+      correct: 0,
+      explanation: "On schedule = по графику, в срок. Behind schedule = с опозданием. Ahead of schedule = опережая план.",
+      rule: "<b>on / behind / ahead of schedule</b>",
+      example: "Despite the delays, we managed to finish on schedule."
+    },
+    {
+      q: "The new policy came into _____ last January.",
+      badge: "🔗 Коллокации",
+      options: ["force", "effect", "action", "power"],
+      correct: 1,
+      explanation: "Come into effect = вступить в силу (о законе, правиле). Come into force — тоже правильно и часто используется взаимозаменяемо.",
+      rule: "<b>come into effect / force</b> = (о законе) вступить в силу",
+      example: "The new regulations came into effect on the 1st of March."
+    },
+    {
+      q: "He _____ a valid point about the risks involved.",
+      badge: "🔗 Make vs Raise",
+      options: ["did", "raised", "made", "brought"],
+      correct: 2,
+      explanation: "Make a point = высказать аргумент/мнение. Raise a point тоже возможно (более формально = поднять вопрос). Do/bring не используются.",
+      rule: "<b>make a point / argument / suggestion</b>",
+      example: "She made a valid point about the budget constraints."
+    },
+    {
+      q: "The negotiations _____ a standstill after the disagreement.",
+      badge: "🔗 Коллокации",
+      options: ["came to", "went to", "reached at", "arrived at"],
+      correct: 0,
+      explanation: "Come to a standstill / halt / conclusion / end — устойчивые глагольно-именные сочетания.",
+      rule: "<b>come to a standstill / halt / conclusion / agreement</b>",
+      example: "Traffic came to a complete standstill during the protest."
+    },
+    {
+      q: "The company _____ losses of over £2 million last year.",
+      badge: "🔗 Коллокации",
+      options: ["made", "did", "incurred", "created"],
+      correct: 2,
+      explanation: "Incur losses/costs/debts — формальное деловое выражение. Make losses менее идиоматично. Did/created не используются.",
+      rule: "<b>incur losses / costs / debts / penalties</b> (формальный стиль)",
+      example: "The firm incurred heavy costs due to the legal dispute."
+    },
+    {
+      q: "She _____ a thorough analysis of the data before presenting.",
+      badge: "🔗 Do vs Carry out",
+      options: ["did", "made", "carried out", "took"],
+      correct: 2,
+      explanation: "Carry out an analysis / investigation / experiment / study — более формально, чем do. Оба верны, но carry out — предпочтительнее в академическом/деловом тексте.",
+      rule: "<b>carry out / conduct an analysis / study / investigation</b>",
+      example: "They carried out extensive tests before launching the product."
+    },
+    {
+      q: "Despite his efforts, he failed to _____ the trust of his colleagues.",
+      badge: "🔗 Коллокации",
+      options: ["gain", "get", "win", "earn"],
+      correct: 3,
+      explanation: "Earn trust/respect/reputation = заслужить (через усилия). Gain trust тоже возможно. Win trust/respect — разговорный вариант. Earn — наиболее точное.",
+      rule: "<b>earn / gain trust / respect / credibility</b>",
+      example: "She earned the respect of her team through hard work."
+    },
+    {
+      q: "The decision was _____ by a majority vote.",
+      badge: "🔗 Passive Collocations",
+      options: ["taken", "made", "done", "reached"],
+      correct: 0,
+      explanation: "Decision can be: made, taken, or reached. 'Taken by a vote' — стандартная коллокация в официальных/юридических контекстах. 'Made by majority' тоже возможно.",
+      rule: "<b>decision: make / take / reach a decision</b>",
+      example: "A decision was taken at the board meeting."
+    },
+    {
+      q: "The report _____ light on some previously overlooked issues.",
+      badge: "🔗 Коллокации",
+      options: ["put", "threw", "sheds", "cast"],
+      correct: 2,
+      explanation: "Shed light on = пролить свет на (выяснить, прояснить). Cast light on — устаревшее. Throw light тоже возможно, но shed — наиболее распространено.",
+      rule: "<b>shed light on</b> = to clarify or reveal something",
+      example: "The new evidence shed light on the mystery."
+    },
+    {
+      q: "He _____ a tremendous effort to finish the marathon.",
+      badge: "🔗 Make vs Take",
+      options: ["did", "made", "put in", "took"],
+      correct: 2,
+      explanation: "Put in effort/work = вложить усилия. Make an effort тоже возможно. Put in — более разговорное и живое, подчёркивает вложенный труд.",
+      rule: "<b>put in (an) effort / work / time</b> OR <b>make an effort</b>",
+      example: "She put in a tremendous amount of effort preparing for the exam."
+    },
+  ],
+};
 
 // ═══════════════════════════════════════════════════════════
 // СОСТОЯНИЕ
 // ═══════════════════════════════════════════════════════════
-let currentModule = 'dates'; // 'dates' | 'persons'
+let currentModule = null;   // 'dates' | 'persons' | 'english'
+let currentEnglishLevel = null;
+let currentEnglishTopic = null;
 let selectedCount = { d: null, p: null };
 let selectedType  = { d: null, p: null };
 let questions = [];
@@ -644,8 +2046,31 @@ function goToMenu(module) {
   showScreen(module === 'dates' ? 'dates-menu' : 'persons-menu');
 }
 
+function showEnglishTopics(level) {
+  currentEnglishLevel = level;
+  showScreen('english-topics-' + level);
+}
+
+function goBackFromQuiz() {
+  if (currentModule === 'english') {
+    showScreen('english-topics-' + currentEnglishLevel);
+  } else if (currentModule === 'dates') {
+    showScreen('dates-menu');
+  } else {
+    showScreen('persons-menu');
+  }
+}
+
+function goResultHome() {
+  if (currentModule === 'english') {
+    showScreen('english-topics-' + currentEnglishLevel);
+  } else {
+    showScreen('history-home');
+  }
+}
+
 // ═══════════════════════════════════════════════════════════
-// ВЫБОР НАСТРОЕК
+// HISTORY: выбор настроек
 // ═══════════════════════════════════════════════════════════
 function selectCount(val, prefix) {
   selectedCount[prefix] = val;
@@ -653,14 +2078,12 @@ function selectCount(val, prefix) {
   document.getElementById(`${prefix}-cnt-${val}`).classList.add('selected');
   updateStartBtn(prefix);
 }
-
 function selectType(val, prefix) {
   selectedType[prefix] = val;
   document.querySelectorAll(`[id^="${prefix}-type-"]`).forEach(b => b.classList.remove('selected'));
   document.getElementById(`${prefix}-type-${val}`).classList.add('selected');
   updateStartBtn(prefix);
 }
-
 function updateStartBtn(prefix) {
   const btn = document.getElementById(prefix + '-start-btn');
   btn.disabled = !(selectedCount[prefix] && selectedType[prefix]);
@@ -677,117 +2100,109 @@ function shuffle(arr) {
   }
   return a;
 }
-
 function yearToInt(s) {
   const m = s.match(/\d+/);
   return m ? parseInt(m[0]) : -9999;
 }
 
 // ═══════════════════════════════════════════════════════════
-// ДИСТРАКТОРЫ ДЛЯ ДАТ
+// HISTORY: дистракторы и вопросы
 // ═══════════════════════════════════════════════════════════
-function smartDistractorsDates(correctDate, correctEvent, mode, n = 3) {
+function smartDistractorsDates(correctDate, correctEvent, mode, n=3) {
   const correctYear = yearToInt(correctDate);
   const allCorrectDates = new Set(ALL_DATES.filter(([,e]) => e === correctEvent).map(([d]) => d));
   const allCorrectEvents = new Set(ALL_DATES.filter(([d]) => d === correctDate).map(([,e]) => e));
-
-  let pool = ALL_DATES.filter(([d, e]) => {
-    if (mode === 'date') return !allCorrectDates.has(d) && !allCorrectEvents.has(e);
+  let pool = ALL_DATES.filter(([d,e]) => {
+    if (mode==='date') return !allCorrectDates.has(d) && !allCorrectEvents.has(e);
     else return !allCorrectEvents.has(e) && !allCorrectDates.has(d);
   });
-  pool.sort((a, b) => Math.abs(yearToInt(a[0]) - correctYear) - Math.abs(yearToInt(b[0]) - correctYear));
-
+  pool.sort((a,b) => Math.abs(yearToInt(a[0])-correctYear) - Math.abs(yearToInt(b[0])-correctYear));
   const seenDates = new Set([correctDate]);
   const seenEvents = new Set([correctEvent]);
   const result = [];
-  for (const [d, e] of pool) {
-    if (mode === 'date') {
-      if (!seenDates.has(d)) { result.push([d, e]); seenDates.add(d); }
-    } else {
-      if (!seenEvents.has(e)) { result.push([d, e]); seenEvents.add(e); }
-    }
-    if (result.length === n) break;
+  for (const [d,e] of pool) {
+    if (mode==='date') { if (!seenDates.has(d)) { result.push([d,e]); seenDates.add(d); } }
+    else { if (!seenEvents.has(e)) { result.push([d,e]); seenEvents.add(e); } }
+    if (result.length===n) break;
   }
-  return result.slice(0, n);
+  return result.slice(0,n);
 }
-
-// ═══════════════════════════════════════════════════════════
-// ДИСТРАКТОРЫ ДЛЯ ЛИЧНОСТЕЙ
-// ═══════════════════════════════════════════════════════════
-function smartDistractorsPersons(correctName, correctDesc, mode, n = 3) {
-  let pool = ALL_PERSONS.filter(([name, desc]) => !(name === correctName && desc === correctDesc));
+function smartDistractorsPersons(correctName, correctDesc, mode, n=3) {
+  let pool = ALL_PERSONS.filter(([name,desc]) => !(name===correctName && desc===correctDesc));
   pool = shuffle(pool);
-
   const seenNames = new Set([correctName]);
   const seenDescs = new Set([correctDesc]);
   const result = [];
-  for (const [name, desc] of pool) {
-    if (mode === 'name') {
-      if (!seenNames.has(name)) { result.push([name, desc]); seenNames.add(name); }
-    } else {
-      if (!seenDescs.has(desc)) { result.push([name, desc]); seenDescs.add(desc); }
-    }
-    if (result.length === n) break;
+  for (const [name,desc] of pool) {
+    if (mode==='name') { if (!seenNames.has(name)) { result.push([name,desc]); seenNames.add(name); } }
+    else { if (!seenDescs.has(desc)) { result.push([name,desc]); seenDescs.add(desc); } }
+    if (result.length===n) break;
   }
-  return result.slice(0, n);
+  return result.slice(0,n);
 }
-
-// ═══════════════════════════════════════════════════════════
-// ПОСТРОЕНИЕ ВОПРОСОВ
-// ═══════════════════════════════════════════════════════════
 function buildDateQuestion(item, mode) {
   const [correctDate, correctEvent] = item;
   const distractors = smartDistractorsDates(correctDate, correctEvent, mode);
   let questionText, options;
-  if (mode === 'date') {
+  if (mode==='date') {
     questionText = correctEvent;
     options = [[correctDate, true], ...distractors.map(([d]) => [d, false])];
   } else {
     questionText = correctDate;
     options = [[correctEvent, true], ...distractors.map(([,e]) => [e, false])];
   }
-  return { questionText, mode, options: shuffle(options), correctDate, correctEvent, type: 'date' };
+  return { questionText, mode, options: shuffle(options), correctDate, correctEvent, type:'date' };
 }
-
 function buildPersonQuestion(item, mode) {
   const [correctName, correctDesc] = item;
   const distractors = smartDistractorsPersons(correctName, correctDesc, mode);
   let questionText, options;
-  if (mode === 'name') {
-    // показываем имя — выбираем описание
+  if (mode==='name') {
     questionText = correctName;
     options = [[correctDesc, true], ...distractors.map(([,d]) => [d, false])];
   } else {
-    // показываем описание — выбираем имя
     questionText = correctDesc;
     options = [[correctName, true], ...distractors.map(([n]) => [n, false])];
   }
-  return { questionText, mode, options: shuffle(options), correctName, correctDesc, type: 'person' };
+  return { questionText, mode, options: shuffle(options), correctName, correctDesc, type:'person' };
 }
 
 // ═══════════════════════════════════════════════════════════
-// ЗАПУСК КВИЗА
+// ЗАПУСК КВИЗА: ИСТОРИЯ
 // ═══════════════════════════════════════════════════════════
 function startQuiz(module) {
   currentModule = module;
-  const prefix = module === 'dates' ? 'd' : 'p';
+  const prefix = module==='dates' ? 'd' : 'p';
   const cnt = selectedCount[prefix];
   const typ = selectedType[prefix];
-
-  if (module === 'dates') {
-    const pool = shuffle(ALL_DATES).slice(0, cnt === 'all' ? ALL_DATES.length : cnt);
+  if (module==='dates') {
+    const pool = shuffle(ALL_DATES).slice(0, cnt==='all' ? ALL_DATES.length : cnt);
     questions = pool.map(item => {
-      const mode = typ === 'mixed' ? (Math.random() < 0.5 ? 'date' : 'event') : typ;
+      const mode = typ==='mixed' ? (Math.random()<0.5?'date':'event') : typ;
       return buildDateQuestion(item, mode);
     });
   } else {
-    const pool = shuffle(ALL_PERSONS).slice(0, cnt === 'all' ? ALL_PERSONS.length : cnt);
+    const pool = shuffle(ALL_PERSONS).slice(0, cnt==='all' ? ALL_PERSONS.length : cnt);
     questions = pool.map(item => {
-      const mode = typ === 'mixed' ? (Math.random() < 0.5 ? 'name' : 'desc') : typ;
+      const mode = typ==='mixed' ? (Math.random()<0.5?'name':'desc') : typ;
       return buildPersonQuestion(item, mode);
     });
   }
+  currentIdx = 0; score = 0; sessionLog = [];
+  showScreen('quiz');
+  renderQuestion();
+}
 
+// ═══════════════════════════════════════════════════════════
+// ЗАПУСК КВИЗА: АНГЛИЙСКИЙ
+// ═══════════════════════════════════════════════════════════
+function startEnglishQuiz(level, topic) {
+  currentModule = 'english';
+  currentEnglishLevel = level;
+  currentEnglishTopic = topic;
+  const key = level + '_' + topic;
+  const pool = ENGLISH_QUESTIONS[key] || [];
+  questions = shuffle(pool).map(q => ({ ...q, type: 'english' }));
   currentIdx = 0; score = 0; sessionLog = [];
   showScreen('quiz');
   renderQuestion();
@@ -799,40 +2214,99 @@ function startQuiz(module) {
 function renderQuestion() {
   const q = questions[currentIdx];
   const total = questions.length;
-
-  document.getElementById('progress-label').textContent = `Вопрос ${currentIdx + 1} из ${total}`;
+  document.getElementById('progress-label').textContent = `Вопрос ${currentIdx+1} из ${total}`;
   document.getElementById('progress-score').textContent = `✓ ${score}`;
-  document.getElementById('progress-fill').style.width = `${(currentIdx / total) * 100}%`;
+  document.getElementById('progress-fill').style.width = `${(currentIdx/total)*100}%`;
 
   const badge = document.getElementById('question-badge');
-  if (q.type === 'date') {
-    badge.textContent = q.mode === 'date' ? '📖 Событие → дата' : '📅 Дата → событие';
+  if (q.type==='english') {
+    badge.textContent = q.badge || '🇬🇧 Английский';
+    badge.style.background = 'color-mix(in srgb, var(--purple) 15%, transparent)';
+    badge.style.color = 'var(--purple)';
   } else {
-    badge.textContent = q.mode === 'name' ? '👤 Имя → описание' : '🔍 Описание → имя';
+    badge.style.background = '';
+    badge.style.color = '';
+    if (q.type==='date') {
+      badge.textContent = q.mode==='date' ? '📖 Событие → дата' : '📅 Дата → событие';
+    } else {
+      badge.textContent = q.mode==='name' ? '👤 Имя → описание' : '🔍 Описание → имя';
+    }
   }
 
-  document.getElementById('question-text').textContent = q.questionText;
+  document.getElementById('question-text').innerHTML = q.type==='english' ? q.q : q.questionText;
 
   const list = document.getElementById('answers-list');
   list.innerHTML = '';
-  const labels = ['A', 'B', 'C', 'D'];
-  q.options.forEach(([text, isCorrect], i) => {
-    const btn = document.createElement('button');
-    btn.className = 'answer-card';
-    btn.innerHTML = `<span class="answer-label">${labels[i]}</span><span class="answer-text">${text}</span>`;
-    btn.onclick = () => handleAnswer(i, text, isCorrect);
-    list.appendChild(btn);
-  });
+  const labels = ['A','B','C','D'];
+
+  if (q.type==='english') {
+    q.options.forEach((text, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-card';
+      btn.innerHTML = `<span class="answer-label">${labels[i]}</span><span class="answer-text">${text}</span>`;
+      btn.onclick = () => handleAnswerEnglish(i, q);
+      list.appendChild(btn);
+    });
+  } else {
+    q.options.forEach(([text, isCorrect], i) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-card';
+      btn.innerHTML = `<span class="answer-label">${labels[i]}</span><span class="answer-text">${text}</span>`;
+      btn.onclick = () => handleAnswerHistory(i, text, isCorrect, q);
+      list.appendChild(btn);
+    });
+  }
 
   document.getElementById('feedback-bar').className = 'feedback-bar';
   document.getElementById('next-btn').className = 'next-btn';
 }
 
 // ═══════════════════════════════════════════════════════════
-// ОБРАБОТКА ОТВЕТА
+// ОБРАБОТКА ОТВЕТА: АНГЛИЙСКИЙ
 // ═══════════════════════════════════════════════════════════
-function handleAnswer(idx, chosenText, isCorrect) {
-  const q = questions[currentIdx];
+function handleAnswerEnglish(idx, q) {
+  const cards = document.querySelectorAll('.answer-card');
+  cards.forEach(c => c.disabled = true);
+  const isCorrect = (idx === q.correct);
+
+  if (isCorrect) {
+    cards[idx].classList.add('correct');
+    score++;
+  } else {
+    cards[idx].classList.add('wrong');
+    cards[q.correct].classList.add('correct');
+  }
+
+  const fb = document.getElementById('feedback-bar');
+  const fbTitle = document.getElementById('fb-title');
+  const fbExpl = document.getElementById('fb-explanation');
+  const fbRule = document.getElementById('fb-rule');
+
+  fb.className = isCorrect ? 'feedback-bar correct-fb show' : 'feedback-bar wrong-fb show';
+  fbTitle.textContent = isCorrect ? '✅ Верно!' : `❌ Неверно! Правильный ответ: ${q.options[q.correct]}`;
+  fbExpl.textContent = q.explanation || '';
+  fbRule.innerHTML = (q.rule ? q.rule : '') + (q.example ? `<div class="fb-example">📌 ${q.example}</div>` : '');
+
+  sessionLog.push({
+    type: 'english',
+    questionText: q.q,
+    badge: q.badge,
+    chosenText: q.options[idx],
+    correctText: q.options[q.correct],
+    explanation: q.explanation,
+    rule: q.rule,
+    isCorrect,
+  });
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.className = 'next-btn show';
+  nextBtn.textContent = currentIdx+1 < questions.length ? 'Следующий →' : 'Посмотреть итог →';
+}
+
+// ═══════════════════════════════════════════════════════════
+// ОБРАБОТКА ОТВЕТА: ИСТОРИЯ
+// ═══════════════════════════════════════════════════════════
+function handleAnswerHistory(idx, chosenText, isCorrect, q) {
   const cards = document.querySelectorAll('.answer-card');
   cards.forEach(c => c.disabled = true);
 
@@ -846,24 +2320,26 @@ function handleAnswer(idx, chosenText, isCorrect) {
 
   const fb = document.getElementById('feedback-bar');
   const fbTitle = document.getElementById('fb-title');
-  const fbPair = document.getElementById('fb-pair');
+  const fbExpl = document.getElementById('fb-explanation');
+  const fbRule = document.getElementById('fb-rule');
 
   fb.className = isCorrect ? 'feedback-bar correct-fb show' : 'feedback-bar wrong-fb show';
   fbTitle.textContent = isCorrect ? '✅ Верно!' : '❌ Неверно!';
+  fbRule.innerHTML = '';
 
-  if (q.type === 'date') {
-    const relatedEvents = ALL_DATES.filter(([d]) => d === q.correctDate);
+  if (q.type==='date') {
+    const relatedEvents = ALL_DATES.filter(([d]) => d===q.correctDate);
     let html = '';
-    relatedEvents.forEach(([d, e]) => { html += `<div>📅 <b>${d}</b> — ${e}</div>`; });
-    fbPair.innerHTML = html;
+    relatedEvents.forEach(([d,e]) => { html += `<div>📅 <b>${d}</b> — ${e}</div>`; });
+    fbExpl.innerHTML = html;
   } else {
-    fbPair.innerHTML = `<div>👤 <b>${q.correctName}</b> — ${q.correctDesc}</div>`;
+    fbExpl.innerHTML = `<div>👤 <b>${q.correctName}</b> — ${q.correctDesc}</div>`;
   }
 
   sessionLog.push({
+    type: q.type,
     questionText: q.questionText,
     mode: q.mode,
-    type: q.type,
     correctDate: q.correctDate,
     correctEvent: q.correctEvent,
     correctName: q.correctName,
@@ -874,7 +2350,7 @@ function handleAnswer(idx, chosenText, isCorrect) {
 
   const nextBtn = document.getElementById('next-btn');
   nextBtn.className = 'next-btn show';
-  nextBtn.textContent = currentIdx + 1 < questions.length ? 'Следующий →' : 'Посмотреть итог →';
+  nextBtn.textContent = currentIdx+1 < questions.length ? 'Следующий →' : 'Посмотреть итог →';
 }
 
 function nextQuestion() {
@@ -889,20 +2365,18 @@ function nextQuestion() {
 function showResults() {
   const total = questions.length;
   const wrong = total - score;
-  const pct = Math.round(score / total * 100);
-
+  const pct = Math.round(score/total*100);
   let emoji, title;
-  if (pct >= 90) { emoji = '🏆'; title = 'Отлично!'; }
-  else if (pct >= 70) { emoji = '👍'; title = 'Хорошо!'; }
-  else if (pct >= 50) { emoji = '📈'; title = 'Неплохо!'; }
-  else { emoji = '📚'; title = 'Нужно повторить!'; }
-
+  if (pct>=90) { emoji='🏆'; title='Отлично!'; }
+  else if (pct>=70) { emoji='👍'; title='Хорошо!'; }
+  else if (pct>=50) { emoji='📈'; title='Неплохо!'; }
+  else { emoji='📚'; title='Нужно повторить!'; }
   document.getElementById('result-emoji').textContent = emoji;
   document.getElementById('result-title').textContent = title;
   document.getElementById('result-subtitle').textContent = `${score} из ${total} правильных ответов`;
   document.getElementById('stat-correct').textContent = score;
   document.getElementById('stat-wrong').textContent = wrong;
-  document.getElementById('stat-pct').textContent = pct + '%';
+  document.getElementById('stat-pct').textContent = pct+'%';
 
   const reviewList = document.getElementById('review-list');
   reviewList.innerHTML = '';
@@ -911,36 +2385,60 @@ function showResults() {
     const div = document.createElement('div');
     div.className = `review-item ${log.isCorrect ? 'review-correct' : 'review-wrong'}`;
     const badgeText = log.isCorrect ? '✓ Верно' : '✗ Неверно';
-    let modeText = '';
-    if (log.type === 'date') modeText = log.mode === 'date' ? 'Событие → дата' : 'Дата → событие';
-    else modeText = log.mode === 'name' ? 'Имя → описание' : 'Описание → имя';
 
-    let answersHtml = '';
-    if (log.isCorrect) {
-      answersHtml = `<div class="review-answer ra-correct"><span class="ra-icon">✓</span><span>${log.chosenText}</span></div>`;
+    if (log.type==='english') {
+      let answersHtml = '';
+      if (log.isCorrect) {
+        answersHtml = `<div class="review-answer ra-correct"><span>✓</span><span>${log.chosenText}</span></div>`;
+      } else {
+        answersHtml = `
+          <div class="review-answer ra-wrong"><span>✗</span><span>Вы: ${log.chosenText}</span></div>
+          <div class="review-answer ra-correct"><span>✓</span><span>Верно: ${log.correctText}</span></div>`;
+      }
+      div.innerHTML = `
+        <div class="review-item-header">
+          <span class="review-badge">${badgeText}</span>
+          <span style="font-size:11px;color:var(--hint)">${log.badge||''}</span>
+        </div>
+        <div class="review-question">${log.questionText}</div>
+        <div class="review-answers">${answersHtml}</div>
+        ${log.explanation ? `<div class="review-explanation">💡 ${log.explanation}</div>` : ''}`;
     } else {
-      let correctAnswer = '';
-      if (log.type === 'date') correctAnswer = log.mode === 'date' ? log.correctDate : log.correctEvent;
-      else correctAnswer = log.mode === 'name' ? log.correctDesc : log.correctName;
-      answersHtml = `
-        <div class="review-answer ra-wrong"><span class="ra-icon">✗</span><span>Ваш ответ: ${log.chosenText}</span></div>
-        <div class="review-answer ra-correct"><span class="ra-icon">✓</span><span>Верно: ${correctAnswer}</span></div>`;
+      let modeText = '';
+      if (log.type==='date') modeText = log.mode==='date' ? 'Событие → дата' : 'Дата → событие';
+      else modeText = log.mode==='name' ? 'Имя → описание' : 'Описание → имя';
+      let answersHtml = '';
+      if (log.isCorrect) {
+        answersHtml = `<div class="review-answer ra-correct"><span>✓</span><span>${log.chosenText}</span></div>`;
+      } else {
+        let correctAnswer = '';
+        if (log.type==='date') correctAnswer = log.mode==='date' ? log.correctDate : log.correctEvent;
+        else correctAnswer = log.mode==='name' ? log.correctDesc : log.correctName;
+        answersHtml = `
+          <div class="review-answer ra-wrong"><span>✗</span><span>Ваш ответ: ${log.chosenText}</span></div>
+          <div class="review-answer ra-correct"><span>✓</span><span>Верно: ${correctAnswer}</span></div>`;
+      }
+      div.innerHTML = `
+        <div class="review-item-header">
+          <span class="review-badge">${badgeText}</span>
+          <span style="font-size:11px;color:var(--hint)">${modeText}</span>
+        </div>
+        <div class="review-question">${log.questionText}</div>
+        <div class="review-answers">${answersHtml}</div>`;
     }
-
-    div.innerHTML = `
-      <div class="review-item-header">
-        <span class="review-badge">${badgeText}</span>
-        <span style="font-size:11px;color:var(--hint)">${modeText}</span>
-      </div>
-      <div class="review-question">${log.questionText}</div>
-      <div class="review-answers">${answersHtml}</div>`;
     reviewList.appendChild(div);
   });
 
   showScreen('results');
 }
 
-function restartQuiz() { startQuiz(currentModule); }
+function restartQuiz() {
+  if (currentModule==='english') {
+    startEnglishQuiz(currentEnglishLevel, currentEnglishTopic);
+  } else {
+    startQuiz(currentModule);
+  }
+}
 </script>
 </body>
 </html>
